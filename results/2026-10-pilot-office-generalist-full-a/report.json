@@ -1,0 +1,2954 @@
+{
+  "family": "office-generalist",
+  "runs": [
+    {
+      "arm": "P",
+      "cost_usd": 40.69,
+      "file": "runs/claude-fable-5-1/P-run1.json",
+      "first_half": 13,
+      "host_version": "2.1.310 (Claude Code)",
+      "model": "claude-fable-5-1",
+      "passed": 31,
+      "repeat_encounters": 27,
+      "repeat_misses": 4,
+      "run": 1,
+      "second_half": 18
+    },
+    {
+      "arm": "0",
+      "cost_usd": 13.18,
+      "file": "runs/claude-opus-5-5/0-run1.json",
+      "first_half": 14,
+      "host_version": "2.1.310 (Claude Code)",
+      "model": "claude-opus-5-5",
+      "passed": 26,
+      "repeat_encounters": 26,
+      "repeat_misses": 4,
+      "run": 1,
+      "second_half": 12
+    },
+    {
+      "arm": "K",
+      "cost_usd": 11.75,
+      "file": "runs/claude-opus-5-5/K-run1.json",
+      "first_half": 16,
+      "host_version": "2.1.310 (Claude Code)",
+      "model": "claude-opus-5-5",
+      "passed": 29,
+      "repeat_encounters": 23,
+      "repeat_misses": 4,
+      "run": 1,
+      "second_half": 13
+    },
+    {
+      "arm": "P",
+      "cost_usd": 14.86,
+      "file": "runs/claude-opus-5-5/P-run1.json",
+      "first_half": 14,
+      "host_version": "2.1.310 (Claude Code)",
+      "model": "claude-opus-5-5",
+      "passed": 32,
+      "repeat_encounters": 27,
+      "repeat_misses": 1,
+      "run": 1,
+      "second_half": 18
+    },
+    {
+      "arm": "P",
+      "cost_usd": 14.46,
+      "file": "runs/claude-opus-5-5/P-run2.json",
+      "first_half": 14,
+      "host_version": "2.1.310 (Claude Code)",
+      "model": "claude-opus-5-5",
+      "passed": 31,
+      "repeat_encounters": 24,
+      "repeat_misses": 3,
+      "run": 2,
+      "second_half": 17
+    },
+    {
+      "arm": "P",
+      "cost_usd": 5.9,
+      "file": "runs/claude-sonnet-5-5/P-run1.json",
+      "first_half": 12,
+      "host_version": "2.1.310 (Claude Code)",
+      "model": "claude-sonnet-5-5",
+      "passed": 24,
+      "repeat_encounters": 26,
+      "repeat_misses": 12,
+      "run": 1,
+      "second_half": 12
+    }
+  ],
+  "stream": "full-a",
+  "summaries": {
+    "fable-5-1 P #1": {
+      "anchor_pass_rate": 0.75,
+      "budget": {
+        "corrections": 21,
+        "cost_usd": 40.6871,
+        "questions": 16,
+        "tool_calls": 751
+      },
+      "by_level": {
+        "base": 0.4848,
+        "raised": 0.6
+      },
+      "coverage": {
+        "covered": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "missing": []
+      },
+      "extinction": {
+        "C1": {
+          "encounters": 5,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "C1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "C2": {
+          "encounters": 4,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "F1": {
+          "encounters": 4,
+          "extinct_after": 3,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "F1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F2": {
+          "encounters": 7,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "F2v2": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F2v3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F3": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F4": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O1": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O2": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P05": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P06": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P08": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P09": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P10": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P11": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P12": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P13": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P14": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P15": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P17": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P18": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        },
+        "P19": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 1,
+          "held": false,
+          "misses": 1
+        },
+        "P20": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P21": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S1": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S2": {
+          "encounters": 4,
+          "extinct_after": 1,
+          "first_miss": 1,
+          "held": true,
+          "misses": 1
+        },
+        "S3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        }
+      },
+      "goal_rate": 0.7931,
+      "groups": {
+        "1": {
+          "early": {
+            "n": 2,
+            "passed": 0
+          },
+          "late": {
+            "n": 2,
+            "passed": 2
+          }
+        },
+        "10": {
+          "early": {
+            "n": 2,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "11": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "12": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "13": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "14": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "15": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "16": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "17": {
+          "early": {
+            "n": 7,
+            "passed": 4
+          },
+          "late": {
+            "n": 5,
+            "passed": 5
+          }
+        },
+        "18": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "19": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "2": {
+          "early": {
+            "n": 14,
+            "passed": 8
+          },
+          "late": {
+            "n": 8,
+            "passed": 7
+          }
+        },
+        "3": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 3,
+            "passed": 2
+          }
+        },
+        "4": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 5,
+            "passed": 4
+          }
+        },
+        "5": {
+          "early": {
+            "n": 2,
+            "passed": 2
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "6": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "7": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "8": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "9": {
+          "early": {
+            "n": 10,
+            "passed": 6
+          },
+          "late": {
+            "n": 7,
+            "passed": 5
+          }
+        }
+      },
+      "overgeneralization": {
+        "encounters": 5,
+        "misses": 1,
+        "rate": 0.2,
+        "rules": [
+          "C1x",
+          "F1x",
+          "O1x",
+          "S1x",
+          "S3"
+        ]
+      },
+      "quality": 0.5345,
+      "stream": "full-a",
+      "tasks": 58
+    },
+    "opus-5-5 0 #1": {
+      "anchor_pass_rate": 0.5,
+      "budget": {
+        "corrections": 22,
+        "cost_usd": 13.184,
+        "questions": 17,
+        "tool_calls": 571
+      },
+      "by_level": {
+        "base": 0.4848,
+        "raised": 0.4
+      },
+      "coverage": {
+        "covered": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "missing": []
+      },
+      "extinction": {
+        "C1": {
+          "encounters": 5,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "C1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "C2": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F1": {
+          "encounters": 4,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "F1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        },
+        "F2": {
+          "encounters": 7,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "F2v2": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F2v3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F3": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F4": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O1": {
+          "encounters": 4,
+          "extinct_after": 1,
+          "first_miss": 2,
+          "held": true,
+          "misses": 1
+        },
+        "O1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O2": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P05": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P06": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P08": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P09": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P10": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P11": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P12": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P13": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P14": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P15": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P17": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P18": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        },
+        "P19": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P20": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P21": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S1": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S2": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": 1,
+          "held": false,
+          "misses": 2
+        },
+        "S3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        }
+      },
+      "goal_rate": 0.7241,
+      "groups": {
+        "1": {
+          "early": {
+            "n": 2,
+            "passed": 0
+          },
+          "late": {
+            "n": 2,
+            "passed": 1
+          }
+        },
+        "10": {
+          "early": {
+            "n": 2,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "11": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "12": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "13": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "14": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "15": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "16": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "17": {
+          "early": {
+            "n": 7,
+            "passed": 4
+          },
+          "late": {
+            "n": 5,
+            "passed": 2
+          }
+        },
+        "18": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "19": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "2": {
+          "early": {
+            "n": 14,
+            "passed": 9
+          },
+          "late": {
+            "n": 8,
+            "passed": 5
+          }
+        },
+        "3": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 3,
+            "passed": 2
+          }
+        },
+        "4": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 5,
+            "passed": 2
+          }
+        },
+        "5": {
+          "early": {
+            "n": 2,
+            "passed": 2
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "6": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "7": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "8": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "9": {
+          "early": {
+            "n": 10,
+            "passed": 7
+          },
+          "late": {
+            "n": 7,
+            "passed": 4
+          }
+        }
+      },
+      "overgeneralization": {
+        "encounters": 5,
+        "misses": 2,
+        "rate": 0.4,
+        "rules": [
+          "C1x",
+          "F1x",
+          "O1x",
+          "S1x",
+          "S3"
+        ]
+      },
+      "quality": 0.4483,
+      "stream": "full-a",
+      "tasks": 58
+    },
+    "opus-5-5 K #1": {
+      "anchor_pass_rate": 1.0,
+      "budget": {
+        "corrections": 21,
+        "cost_usd": 11.7494,
+        "questions": 23,
+        "tool_calls": 560
+      },
+      "by_level": {
+        "base": 0.6061,
+        "raised": 0.36
+      },
+      "coverage": {
+        "covered": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "missing": []
+      },
+      "extinction": {
+        "C1": {
+          "encounters": 5,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "C1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "C2": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F1": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "F1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        },
+        "F2": {
+          "encounters": 7,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "F2v2": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F2v3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F3": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F4": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O1": {
+          "encounters": 4,
+          "extinct_after": 1,
+          "first_miss": 2,
+          "held": true,
+          "misses": 1
+        },
+        "O1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O2": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P05": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 1,
+          "held": false,
+          "misses": 1
+        },
+        "P06": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P08": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P09": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P10": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P11": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P12": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P13": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P14": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P15": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        },
+        "P17": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P18": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        },
+        "P19": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P20": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P21": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S1": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S2": {
+          "encounters": 4,
+          "extinct_after": 1,
+          "first_miss": 1,
+          "held": true,
+          "misses": 1
+        },
+        "S3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        }
+      },
+      "goal_rate": 0.7759,
+      "groups": {
+        "1": {
+          "early": {
+            "n": 2,
+            "passed": 0
+          },
+          "late": {
+            "n": 2,
+            "passed": 1
+          }
+        },
+        "10": {
+          "early": {
+            "n": 2,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "11": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "12": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "13": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "14": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "15": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "16": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "17": {
+          "early": {
+            "n": 7,
+            "passed": 4
+          },
+          "late": {
+            "n": 5,
+            "passed": 3
+          }
+        },
+        "18": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "19": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "2": {
+          "early": {
+            "n": 14,
+            "passed": 9
+          },
+          "late": {
+            "n": 8,
+            "passed": 6
+          }
+        },
+        "3": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 3,
+            "passed": 3
+          }
+        },
+        "4": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 5,
+            "passed": 2
+          }
+        },
+        "5": {
+          "early": {
+            "n": 2,
+            "passed": 2
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "6": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "7": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "8": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "9": {
+          "early": {
+            "n": 10,
+            "passed": 7
+          },
+          "late": {
+            "n": 7,
+            "passed": 6
+          }
+        }
+      },
+      "overgeneralization": {
+        "encounters": 5,
+        "misses": 2,
+        "rate": 0.4,
+        "rules": [
+          "C1x",
+          "F1x",
+          "O1x",
+          "S1x",
+          "S3"
+        ]
+      },
+      "quality": 0.5,
+      "stream": "full-a",
+      "tasks": 58
+    },
+    "opus-5-5 P #1": {
+      "anchor_pass_rate": 1.0,
+      "budget": {
+        "corrections": 18,
+        "cost_usd": 14.8588,
+        "questions": 17,
+        "tool_calls": 606
+      },
+      "by_level": {
+        "base": 0.5455,
+        "raised": 0.56
+      },
+      "coverage": {
+        "covered": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "missing": []
+      },
+      "extinction": {
+        "C1": {
+          "encounters": 5,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "C1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "C2": {
+          "encounters": 4,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "F1": {
+          "encounters": 4,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "F1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        },
+        "F2": {
+          "encounters": 7,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "F2v2": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F2v3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F3": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F4": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O1": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O2": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P05": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P06": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P08": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P09": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P10": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P11": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P12": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P13": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P14": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P15": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P17": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P18": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        },
+        "P19": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P20": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P21": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S1": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S2": {
+          "encounters": 4,
+          "extinct_after": 1,
+          "first_miss": 1,
+          "held": true,
+          "misses": 1
+        },
+        "S3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        }
+      },
+      "goal_rate": 0.7586,
+      "groups": {
+        "1": {
+          "early": {
+            "n": 2,
+            "passed": 0
+          },
+          "late": {
+            "n": 2,
+            "passed": 2
+          }
+        },
+        "10": {
+          "early": {
+            "n": 2,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "11": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "12": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "13": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "14": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "15": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "16": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "17": {
+          "early": {
+            "n": 7,
+            "passed": 4
+          },
+          "late": {
+            "n": 5,
+            "passed": 5
+          }
+        },
+        "18": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "19": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "2": {
+          "early": {
+            "n": 14,
+            "passed": 8
+          },
+          "late": {
+            "n": 8,
+            "passed": 8
+          }
+        },
+        "3": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 3,
+            "passed": 3
+          }
+        },
+        "4": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 5,
+            "passed": 2
+          }
+        },
+        "5": {
+          "early": {
+            "n": 2,
+            "passed": 2
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "6": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "7": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "8": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "9": {
+          "early": {
+            "n": 10,
+            "passed": 6
+          },
+          "late": {
+            "n": 7,
+            "passed": 6
+          }
+        }
+      },
+      "overgeneralization": {
+        "encounters": 5,
+        "misses": 2,
+        "rate": 0.4,
+        "rules": [
+          "C1x",
+          "F1x",
+          "O1x",
+          "S1x",
+          "S3"
+        ]
+      },
+      "quality": 0.5517,
+      "stream": "full-a",
+      "tasks": 58
+    },
+    "opus-5-5 P #2": {
+      "anchor_pass_rate": 1.0,
+      "budget": {
+        "corrections": 18,
+        "cost_usd": 14.4604,
+        "questions": 17,
+        "tool_calls": 636
+      },
+      "by_level": {
+        "base": 0.5455,
+        "raised": 0.52
+      },
+      "coverage": {
+        "covered": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "missing": []
+      },
+      "extinction": {
+        "C1": {
+          "encounters": 5,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "C1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "C2": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F1": {
+          "encounters": 4,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "F1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F2": {
+          "encounters": 7,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "F2v2": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F2v3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F3": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F4": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O1": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O2": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P05": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P06": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P08": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P09": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P10": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P11": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P12": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P13": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P14": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P15": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P17": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P18": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        },
+        "P19": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P20": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P21": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S1": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S2": {
+          "encounters": 4,
+          "extinct_after": 1,
+          "first_miss": 1,
+          "held": true,
+          "misses": 1
+        },
+        "S3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        }
+      },
+      "goal_rate": 0.7759,
+      "groups": {
+        "1": {
+          "early": {
+            "n": 2,
+            "passed": 0
+          },
+          "late": {
+            "n": 2,
+            "passed": 1
+          }
+        },
+        "10": {
+          "early": {
+            "n": 2,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "11": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "12": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "13": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "14": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "15": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "16": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "17": {
+          "early": {
+            "n": 7,
+            "passed": 4
+          },
+          "late": {
+            "n": 5,
+            "passed": 3
+          }
+        },
+        "18": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "19": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "2": {
+          "early": {
+            "n": 14,
+            "passed": 9
+          },
+          "late": {
+            "n": 8,
+            "passed": 7
+          }
+        },
+        "3": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 3,
+            "passed": 3
+          }
+        },
+        "4": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 5,
+            "passed": 3
+          }
+        },
+        "5": {
+          "early": {
+            "n": 2,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "6": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "7": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "8": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "9": {
+          "early": {
+            "n": 10,
+            "passed": 7
+          },
+          "late": {
+            "n": 7,
+            "passed": 6
+          }
+        }
+      },
+      "overgeneralization": {
+        "encounters": 5,
+        "misses": 1,
+        "rate": 0.2,
+        "rules": [
+          "C1x",
+          "F1x",
+          "O1x",
+          "S1x",
+          "S3"
+        ]
+      },
+      "quality": 0.5345,
+      "stream": "full-a",
+      "tasks": 58
+    },
+    "sonnet-5-5 P #1": {
+      "anchor_pass_rate": 0.5,
+      "budget": {
+        "corrections": 29,
+        "cost_usd": 5.9007,
+        "questions": 13,
+        "tool_calls": 507
+      },
+      "by_level": {
+        "base": 0.4242,
+        "raised": 0.4
+      },
+      "coverage": {
+        "covered": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "missing": []
+      },
+      "extinction": {
+        "C1": {
+          "encounters": 5,
+          "extinct_after": 2,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "C1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "C2": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F1": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "F1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F2": {
+          "encounters": 7,
+          "extinct_after": 3,
+          "first_miss": 0,
+          "held": false,
+          "misses": 3
+        },
+        "F2v2": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "F2v3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        },
+        "F3": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "F4": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O1": {
+          "encounters": 4,
+          "extinct_after": 1,
+          "first_miss": 2,
+          "held": true,
+          "misses": 1
+        },
+        "O1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "O2": {
+          "encounters": 4,
+          "extinct_after": 1,
+          "first_miss": 2,
+          "held": true,
+          "misses": 1
+        },
+        "O3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P05": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P06": {
+          "encounters": 2,
+          "extinct_after": 1,
+          "first_miss": 0,
+          "held": true,
+          "misses": 1
+        },
+        "P08": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P09": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P10": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P11": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P12": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P13": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P14": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P15": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P17": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P18": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 1
+        },
+        "P19": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "P20": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": 0,
+          "held": false,
+          "misses": 2
+        },
+        "P21": {
+          "encounters": 2,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S1": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S1x": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        },
+        "S2": {
+          "encounters": 4,
+          "extinct_after": null,
+          "first_miss": 1,
+          "held": false,
+          "misses": 2
+        },
+        "S3": {
+          "encounters": 1,
+          "extinct_after": null,
+          "first_miss": null,
+          "held": false,
+          "misses": 0
+        }
+      },
+      "goal_rate": 0.7241,
+      "groups": {
+        "1": {
+          "early": {
+            "n": 2,
+            "passed": 0
+          },
+          "late": {
+            "n": 2,
+            "passed": 1
+          }
+        },
+        "10": {
+          "early": {
+            "n": 2,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "11": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "12": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "13": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "14": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "15": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "16": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "17": {
+          "early": {
+            "n": 7,
+            "passed": 1
+          },
+          "late": {
+            "n": 5,
+            "passed": 1
+          }
+        },
+        "18": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "19": {
+          "early": {
+            "n": 1,
+            "passed": 1
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "2": {
+          "early": {
+            "n": 14,
+            "passed": 7
+          },
+          "late": {
+            "n": 8,
+            "passed": 4
+          }
+        },
+        "3": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 3,
+            "passed": 2
+          }
+        },
+        "4": {
+          "early": {
+            "n": 0,
+            "passed": 0
+          },
+          "late": {
+            "n": 5,
+            "passed": 5
+          }
+        },
+        "5": {
+          "early": {
+            "n": 2,
+            "passed": 2
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "6": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 1
+          }
+        },
+        "7": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "8": {
+          "early": {
+            "n": 1,
+            "passed": 0
+          },
+          "late": {
+            "n": 1,
+            "passed": 0
+          }
+        },
+        "9": {
+          "early": {
+            "n": 10,
+            "passed": 5
+          },
+          "late": {
+            "n": 7,
+            "passed": 4
+          }
+        }
+      },
+      "overgeneralization": {
+        "encounters": 5,
+        "misses": 0,
+        "rate": 0.0,
+        "rules": [
+          "C1x",
+          "F1x",
+          "O1x",
+          "S1x",
+          "S3"
+        ]
+      },
+      "quality": 0.4138,
+      "stream": "full-a",
+      "tasks": 58
+    }
+  }
+}

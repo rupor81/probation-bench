@@ -7,8 +7,8 @@ through a long stream of ordinary office assignments. The managers have unwritte
 it breaks one. The bench counts whether each mistake dies out after the correction or keeps coming back.
 
 Status: early. One task family (58 office tasks), one host adapter (Claude Code), free dry runs with scripted
-employees. Results, more hosts and applied task families (corporate management, manufacturing) are on the
-[roadmap](#roadmap).
+employees, and [pilot results](#pilot-results). More hosts and applied task families (corporate management,
+manufacturing) are on the [roadmap](#roadmap).
 
 ## Why another benchmark
 
@@ -146,6 +146,21 @@ Spend is capped per task (`--budget-usd`, default 1) and per Arm (`--max-total-u
 stream has cost about $6 per Arm on Sonnet 5.5 and $12-15 on Opus 5.5. Runs land in `runs/<batch>/<arm>/` with
 every session's stream, the office snapshot before and after each task, and the tool trace. Usage limits are waited
 out; a host failure stops that Arm and keeps what was graded.
+
+## Pilot results
+
+Six full runs of the 58-task stream, October 2026 ([details](results/2026-10-pilot-office-generalist-full-a/)):
+
+| Model | Arm | Passed (of 58) | Repeat misses | Cost (USD) |
+| --- | --- | --- | --- | --- |
+| Opus 5.5 | `0` | 26 | 4 of 26 | 13.18 |
+| Opus 5.5 | `K` | 29 | 4 of 23 | 11.75 |
+| Opus 5.5 | `P` | 31, 32 | 1-3 of 24-27 | 14.46, 14.86 |
+| Fable 5.1 | `P` | 31 | 4 of 27 | 40.69 |
+| Sonnet 5.5 | `P` | 24 | 12 of 26 | 5.90 |
+
+Instructions changed nothing in the first half of the stream and a lot in the second, once corrections had piled
+up. The model mattered most for not repeating a corrected mistake. One or two runs per cell: treat these as a pilot.
 
 ## Repository layout
 

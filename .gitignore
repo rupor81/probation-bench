@@ -4,5 +4,5 @@ __pycache__/
 .pytest_cache/
 dist/
 # Run directories hold full transcripts and office snapshots: large, and not reviewed for publication.
-runs/
-reports/
+/runs/
+/reports/
