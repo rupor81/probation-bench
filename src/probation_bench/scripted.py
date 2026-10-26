@@ -9,12 +9,15 @@ Each task carries `fake.steps`, the calls a competent employee makes (`do`) and 
   change the manager mailed, which a learner reads in the inbox.
 - `learns=False` is the forgetful employee: it takes the naive form every time and keeps no notes.
 - `overgeneralizes=True` applies a learned rule where it does not belong (a step with `overgeneralized_by`).
+- `memorises=True` learns a rule as the fact it was corrected on: a step carries `fact` (e.g. which work centre is the
+  constraint), and when the fact has changed since the correction the memoriser takes the step's `stale` action (or
+  `naive`) until it is corrected again. It separates learning a principle from remembering a fact.
+- `teaches=True` (the oracle always does) also improves the process: a task's `fake.improve` lists actions (write a
+  procedure, mail a colleague) with the rules they need (`after`); each runs once, as soon as those rules are known.
 """
 
 from __future__ import annotations
 
-import csv
-import io
 import re
 from pathlib import Path
 
@@ -24,11 +27,21 @@ __all__ = ["FakeEmployee", "KINDS", "scripted"]
 
 
 class FakeEmployee:
-    def __init__(self, learns: bool = True, overgeneralizes: bool = False, oracle: bool = False) -> None:
+    def __init__(self, learns: bool = True, overgeneralizes: bool = False, oracle: bool = False, memorises: bool = False,
+                 teaches: bool = False) -> None:
         self.learns = learns or oracle
         self.overgeneralizes = overgeneralizes
         self.oracle = oracle
-        self.last_count = 0
+        self.memorises = memorises and not oracle
+        self.teaches = teaches or oracle
+        self.facts: dict[str, str] = {}
+        """Memoriser: rule -> the fact it was corrected on."""
+        self.seen_facts: dict[str, str] = {}
+        self.read_feedback: set[str] = set()
+        self.improved: set[str] = set()
+        self.memo: dict = {}
+        """Scratch state a family builtin may keep between steps (e.g. a count it wrote)."""
+        self.builtins: dict = {}
         self.prompts: list[str] = []
 
     def __call__(self, state: Path, task: dict) -> None:
@@ -41,6 +54,10 @@ class FakeEmployee:
                 match = re.fullmatch(r"fb-[\w-]+-(\w+)", message.get("id", ""))
                 if match:
                     known.add(match.group(1))
+                    if message["id"] not in self.read_feedback:
+                        self.read_feedback.add(message["id"])
+                        if match.group(1) in self.seen_facts:
+                            self.facts[match.group(1)] = self.seen_facts[match.group(1)]
         if self.oracle:
             known |= {s["rule"] for s in steps if s.get("rule")}
         if self.learns:
@@ -53,6 +70,16 @@ class FakeEmployee:
                 self._run(office, chosen)
             if self.learns and step.get("announced"):
                 known.add(step["rule"])
+            if step.get("rule") and step.get("fact"):
+                self.seen_facts[step["rule"]] = step["fact"]
+        if self.teaches:
+            for i, item in enumerate(task["fake"].get("improve", [])):
+                key = f"{task['id']}:{i}:{item.get('key', '')}"
+                if item.get("key") in self.improved or key in self.improved:
+                    continue
+                if set(item.get("after", [])) <= known:
+                    self._run(office, item["do"])
+                    self.improved.add(item.get("key") or key)
         if self.learns:
             office.call("notebook_write", {"content": "\n".join(f"RULE {r}" for r in sorted(known)) or "no rules yet"})
 
@@ -65,46 +92,30 @@ class FakeEmployee:
             return step["naive"] if self.overgeneralizes and source in known else step["do"]
         if step.get("announced"):
             return step["do"] if self.learns else step["naive"]
-        return step["do"] if rule in known else step["naive"]
+        if rule not in known:
+            return step["naive"]
+        if self.memorises and step.get("fact") and self.facts.get(rule, step["fact"]) != step["fact"]:
+            return step.get("stale", step["naive"])
+        return step["do"]
+
+    def bind(self, stream) -> None:
+        """Called by `run_stream` before the first task: the family's builtins become available to `fake` steps."""
+        self.builtins = stream.builtins
 
     def _run(self, office, action: dict) -> None:
         if "builtin" in action:
-            getattr(self, "_" + action["builtin"])(office, action)
+            self.builtins[action["builtin"]](self, office, action)
         else:
             office.call(action["tool"], action["arguments"])
 
-    def _overdue_report(self, office, action: dict) -> None:
-        rows = list(csv.DictReader(io.StringIO(office.call("table_read", {"name": "invoices"})[1])))
-        seen = {}
-        for row in rows:
-            try:
-                amount = float(row["amount"])
-            except ValueError:
-                continue
-            if row["status"] == "open" and row["due"] < "2026-03-31" and row["owner"] == "finance":
-                seen[row["id"]] = amount
-        total = f"{sum(seen.values()):.2f}"
-        self.last_count = len(seen)
-        if action["style"] == "std":
-            content = f"# Overdue\n{', '.join(seen)}\nTOTAL: {total} EUR\n"
-        else:
-            content = f"Overdue invoices: {', '.join(seen)}. Total overdue: {total} euros."
-        office.call("file_write", {"path": action["path"], "content": content})
 
-    def _add_report_line(self, office, action: dict) -> None:
-        ok, text = office.call("file_read", {"path": action["path"]})
-        if not ok:
-            return
-        lines = text.splitlines()
-        lines.insert(len(lines) - 1, action["line"].format(count=self.last_count))
-        office.call("file_write", {"path": action["path"], "content": "\n".join(lines) + "\n"})
-
-
-KINDS = ("oracle", "learner", "forgetful", "overgeneralizer")
-"""The scripted employees a family is checked with: knows every rule, learns from feedback, never learns, over-applies."""
+KINDS = ("oracle", "learner", "forgetful", "overgeneralizer", "memoriser", "teacher")
+"""The scripted employees a family is checked with: knows every rule, learns from feedback, never learns, over-applies,
+remembers facts instead of rules, learns and improves the process."""
 
 
 def scripted(kind: str) -> FakeEmployee:
     """The scripted employee `kind` (one of `KINDS`)."""
     return {"oracle": lambda: FakeEmployee(oracle=True), "learner": FakeEmployee, "forgetful": lambda: FakeEmployee(learns=False),
-            "overgeneralizer": lambda: FakeEmployee(overgeneralizes=True)}[kind]()
+            "overgeneralizer": lambda: FakeEmployee(overgeneralizes=True), "memoriser": lambda: FakeEmployee(memorises=True),
+            "teacher": lambda: FakeEmployee(teaches=True)}[kind]()

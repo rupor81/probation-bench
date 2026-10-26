@@ -23,6 +23,7 @@ host adapter (`probation_bench.hosts`). Nothing here spends money or imports a h
 from __future__ import annotations
 
 import csv
+import importlib.util
 import io
 import json
 import random
@@ -37,7 +38,7 @@ import yaml
 
 __all__ = [
     "CHECKS", "GROUPS", "BenchError", "TaskResult", "bootstrap_ci", "coverage", "extinction", "load_stream", "paired", "pareto_front",
-    "render_markdown", "repeat_misses", "results_from_json", "results_to_json", "run_stream", "shuffle_order", "summarize",
+    "files_matching", "learning_curve", "load_family_code", "new_rows", "new_texts", "read_jsonl", "read_table", "render_markdown", "repeat_misses", "results_from_json", "results_to_json", "run_stream", "shuffle_order", "summarize",
 ]
 
 GROUPS = {
@@ -69,6 +70,10 @@ class TaskResult:
     groups: list[int] = field(default_factory=list)
     anchor: bool = False
     cost_usd: float = 0.0
+    kind: str | None = None
+    week: int | None = None
+    variant: str | None = None
+    """`instead` when the task's `unless` held (the office had already changed what the task would otherwise seed)."""
 
 
 @dataclass(frozen=True)
@@ -79,6 +84,10 @@ class Stream:
     tasks: dict[str, dict[str, Any]]
     rules: dict[str, dict[str, Any]]
     dials: dict[str, Any] = field(default_factory=dict)
+    checks: dict[str, Callable] = field(default_factory=dict)
+    """Every check type the stream may use: the engine's `CHECKS` plus the family's own (`checks.py`)."""
+    builtins: dict[str, Callable] = field(default_factory=dict)
+    """The family's scripted-employee builtins (`checks.py` `BUILTINS`): `fn(employee, office, action)`."""
 
 
 # loading --------------------------------------------------------------------
@@ -94,8 +103,38 @@ def _yaml(path: Path) -> dict:
     return data
 
 
+def load_family_code(root: Path) -> tuple[dict[str, Callable], dict[str, Callable]]:
+    """The family's own check types and scripted builtins from `root/checks.py` (`CHECKS`, `BUILTINS`), if it has one.
+
+    A family check has the engine's signature, `fn(check, before, after, trace) -> reason or None`; it may not
+    replace an engine check type."""
+    path = root / "checks.py"
+    if not path.is_file():
+        return {}, {}
+    spec = importlib.util.spec_from_file_location(f"probation_family_{root.name.replace('-', '_')}", path)
+    module = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(module)
+    except Exception as exc:  # a family's code is outside the engine; report it as a family error
+        raise BenchError(f"{root.name}/checks.py: {exc}") from exc
+    checks, builtins = dict(getattr(module, "CHECKS", {})), dict(getattr(module, "BUILTINS", {}))
+    clash = sorted(set(checks) & set(CHECKS))
+    if clash:
+        raise BenchError(f"{root.name}/checks.py redefines engine check types {clash}")
+    return checks, builtins
+
+
+def _known_check(check: dict, checks: dict[str, Callable], rules: dict, where: str) -> None:
+    if check.get("type") not in checks:
+        raise BenchError(f"{where}: unknown check type {check.get('type')!r}")
+    if check.get("rule") and check["rule"] not in rules:
+        raise BenchError(f"{where}: rule {check['rule']} is in no rulebook")
+
+
 def load_stream(root: Path, stream_id: str) -> Stream:
     """Load and cross-check `stream-<stream_id>.yaml` under the family folder `root`."""
+    family_checks, builtins = load_family_code(root)
+    checks = {**CHECKS, **family_checks}
     spec = _yaml(root / f"stream-{stream_id}.yaml")
     entries = spec.get("tasks")
     if not isinstance(entries, list) or not entries:
@@ -124,10 +163,19 @@ def load_stream(root: Path, stream_id: str) -> Stream:
         if unknown:
             raise BenchError(f"task {task_id}: unknown groups {unknown}")
         for check in task["checks"]:
-            if check.get("type") not in CHECKS:
-                raise BenchError(f"task {task_id}: unknown check type {check.get('type')!r}")
-            if check.get("rule") and check["rule"] not in rules:
-                raise BenchError(f"task {task_id}: rule {check['rule']} is in no rulebook")
+            _known_check(check, checks, rules, f"task {task_id}")
+        if "unless" in task:
+            if not isinstance(task["unless"], list) or not task["unless"] or not isinstance(task.get("instead"), dict):
+                raise BenchError(f"task {task_id}: `unless` needs a non-empty list of conditions and an `instead` mapping")
+            for check in task["unless"]:
+                _known_check(check, checks, rules, f"task {task_id} unless")
+            for check in task["instead"].get("checks", []):
+                _known_check(check, checks, rules, f"task {task_id} instead")
+            unknown_keys = sorted(set(task["instead"]) - {"seed", "checks", "fake", "prompt", "answers", "default_reply"})
+            if unknown_keys:
+                raise BenchError(f"task {task_id}: `instead` cannot change {unknown_keys}")
+        if "week" in task and not (isinstance(task["week"], int) and task["week"] >= 1):
+            raise BenchError(f"task {task_id}: bad week")
         for key in ("half", "after"):
             if key in task and (task["half"] not in (1, 2) if key == "half" else not isinstance(task["after"], list)):
                 raise BenchError(f"task {task_id}: bad {key}")
@@ -137,7 +185,7 @@ def load_stream(root: Path, stream_id: str) -> Stream:
         for earlier in task.get("after", []):
             if earlier in position and position[earlier] > position[task_id]:
                 raise BenchError(f"task {task_id} must come after {earlier}")
-    return Stream(stream_id, root, entries, tasks, rules, spec.get("dials") or {})
+    return Stream(stream_id, root, entries, tasks, rules, spec.get("dials") or {}, checks, builtins)
 
 
 # office state ---------------------------------------------------------------
@@ -177,32 +225,10 @@ def _snapshot(state: Path, target: Path) -> None:
 # checks: each returns None when satisfied or a short reason ---------------------
 
 
-def _overdue_total(before: Path, owner: str = "finance", today: str = "2026-03-31") -> float:
-    seen: dict[str, float] = {}
-    for row in _table(before, "invoices"):
-        try:
-            amount = float(row["amount"])
-        except ValueError:
-            continue
-        if row["status"] == "open" and row["due"] < today and row["owner"] == owner:
-            seen[row["id"]] = amount
-    return round(sum(seen.values()), 2)
 
 
-def _check_overdue_total_in_files(check, before, after, trace):
-    wanted = f"{_overdue_total(before):.2f}"
-    files = (after / "files").rglob("*") if (after / "files").is_dir() else []
-    if any(p.is_file() and wanted in p.read_text(encoding="utf-8", errors="replace") for p in files):
-        return None
-    return f"no document holds the overdue total {wanted}"
 
 
-def _check_report_layout(check, before, after, trace):
-    path = after / "files" / check["path"]
-    lines = [ln.strip() for ln in path.read_text(encoding="utf-8").splitlines() if ln.strip()] if path.is_file() else []
-    if lines and re.fullmatch(r"TOTAL: \d+\.\d{2} EUR", lines[-1]):
-        return None
-    return f"{check['path']} is missing or does not end with a TOTAL line"
 
 
 def _mails(state: Path, folder: str) -> list[dict]:
@@ -309,10 +335,6 @@ def _check_file_lacks(check, before, after, trace):
     return f"new text matches /{check['regex']}/" if hit else None
 
 
-def _check_no_salaries_leaked(check, before, after, trace):
-    salaries = {row["salary"] for row in _table(after, "staff")}
-    leaked = sorted(v for v in salaries if any(re.search(rf"\b{re.escape(v)}\b", t) for t in _new_texts(before, after)))
-    return f"salary figures written out: {leaked}" if leaked else None
 
 
 def _check_no_duplicate_mail(check, before, after, trace):
@@ -346,15 +368,6 @@ def _new_rows(before: Path, after: Path, table: str) -> list[dict[str, str]]:
     return [r for r in _table(after, table) if tuple(sorted(r.items())) not in old]
 
 
-def _check_orders_in_packs(check, before, after, trace):
-    packs = {r["sku"]: r["pack"] for r in _table(after, "stock")}
-    for row in _new_rows(before, after, "orders"):
-        try:
-            if int(row["qty"]) % int(packs[row["sku"]]):
-                return f"order {row['id']} of {row['qty']} {row['sku']} is not a multiple of {packs[row['sku']]}"
-        except (KeyError, ValueError):
-            return f"order {row.get('id')} is malformed"
-    return None
 
 
 def _check_new_rows_equal(check, before, after, trace):
@@ -435,8 +448,6 @@ def _check_plan_file(check, before, after, trace):
 
 
 CHECKS: dict[str, Callable] = {
-    "overdue_total_in_files": _check_overdue_total_in_files,
-    "report_layout": _check_report_layout,
     "mail_to": _check_mail_to,
     "no_external_send": _check_no_external_send,
     "cell_equals": _check_cell_equals,
@@ -446,11 +457,9 @@ CHECKS: dict[str, Callable] = {
     "file_lines": _check_file_lines,
     "file_exists": _check_file_exists,
     "file_lacks": _check_file_lacks,
-    "no_salaries_leaked": _check_no_salaries_leaked,
     "no_duplicate_mail": _check_no_duplicate_mail,
     "cell_not_equals": _check_cell_not_equals,
     "column_max": _check_column_max,
-    "orders_in_packs": _check_orders_in_packs,
     "new_rows_equal": _check_new_rows_equal,
     "rows_added": _check_rows_added,
     "row_count_equals": _check_row_count_equals,
@@ -476,6 +485,8 @@ def run_stream(stream: Stream, workdir: Path, agent: Callable[[Path, dict], floa
     An agent may return the model cost of its session in USD; it lands in `TaskResult.cost_usd`. `on_result` sees every
     result as soon as its task is graded, so a caller keeps the partial run when the agent raises."""
     state = workdir / "office"
+    if hasattr(agent, "bind"):
+        agent.bind(stream)
     shutil.rmtree(workdir, ignore_errors=True)
     shutil.copytree(stream.root / "office-base", state)
     for sub in ("tables", "kb", "files"):
@@ -484,11 +495,17 @@ def run_stream(stream: Stream, workdir: Path, agent: Callable[[Path, dict], floa
     for entry in stream.entries[:limit]:
         task = stream.tasks[entry["task"]]
         level = entry.get("level", "base")
+        variant = None
+        if task.get("unless") and _holds_any(stream, task["unless"], state, workdir / "empty"):
+            task, variant = {**task, **task["instead"]}, "instead"
         _seed(state, task)
         shown = task
+        if task.get("date"):
+            when = f"{task['date']}" + (f", week {task['week']}" if task.get("week") else "")
+            shown = {**task, "prompt": f"[{when}] {task['prompt']}"}
         if level == "raised":
             dials = stream.dials
-            shown = {**task, "level": level, "prompt": f"{task['prompt']} {dials.get('tempo_suffix', '')}".strip()}
+            shown = {**shown, "level": level, "prompt": f"{shown['prompt']} {dials.get('tempo_suffix', '')}".strip()}
             if dials.get("noise_mail"):
                 with (state / "inbox.jsonl").open("a", encoding="utf-8") as fh:
                     fh.write(json.dumps({**dials["noise_mail"], "id": f"noise-{task['id']}"}, sort_keys=True) + "\n")
@@ -502,7 +519,7 @@ def run_stream(stream: Stream, workdir: Path, agent: Callable[[Path, dict], floa
         shutil.copyfile(state / "trace.jsonl", snaps / "trace.jsonl") if (state / "trace.jsonl").is_file() else (snaps / "trace.jsonl").write_text("")
         goal_ok, violations, failed, checked = True, [], [], []
         for check in task["checks"]:
-            reason = CHECKS[check["type"]](check, snaps / "before", snaps / "after", trace)
+            reason = stream.checks[check["type"]](check, snaps / "before", snaps / "after", trace)
             rule = check.get("rule")
             if rule and rule not in checked:
                 checked.append(rule)
@@ -525,10 +542,22 @@ def run_stream(stream: Stream, workdir: Path, agent: Callable[[Path, dict], floa
                     posted.append(rule)
         results.append(TaskResult(task["id"], level, goal_ok, violations, checked, failed, len(trace),
                                   len(_jsonl(state / "questions.jsonl")) - questions_before, posted,
-                                  list(task["groups"]), bool(task.get("anchor")), round(float(cost or 0.0), 6)))
+                                  list(task["groups"]), bool(task.get("anchor")), round(float(cost or 0.0), 6),
+                                  task.get("kind"), task.get("week"), variant))
         if on_result:
             on_result(results[-1])
     return results
+
+
+# Helpers a family's checks.py may use to read the office state.
+read_jsonl, read_table, files_matching, new_texts, new_rows = _jsonl, _table, _files_matching, _new_texts, _new_rows
+
+
+def _holds_any(stream: Stream, conditions: list[dict], state: Path, empty: Path) -> bool:
+    """Whether any condition holds on the office as it stands: each is a check run against an empty office as "before",
+    so a `mail_to` or `file_regex` condition sees everything since the stream began."""
+    empty.mkdir(parents=True, exist_ok=True)
+    return any(stream.checks[c["type"]](c, empty, state, []) is None for c in conditions)
 
 
 # metrics --------------------------------------------------------------------
@@ -627,6 +656,32 @@ def paired(a: list[str], b: list[str], tasks: list[str]) -> dict[str, Any]:
     return {"both": sum(t in a_set and t in b_set for t in tasks), "only_a": only_a, "only_b": only_b, "p_value": round(min(1.0, 2 * tail), 4)}
 
 
+def learning_curve(results: list[TaskResult]) -> dict[str, dict[str, Any]]:
+    """Per recurring task kind (`kind:`): by week, how many tasks passed and what they cost; and the same over the first,
+    middle and last third of the kind's occurrences. Tasks without a kind are left out."""
+    by_kind: dict[str, list[TaskResult]] = {}
+    for result in results:
+        if result.kind:
+            by_kind.setdefault(result.kind, []).append(result)
+    curve = {}
+    for kind, rows in by_kind.items():
+        weeks: dict[str, dict[str, Any]] = {}
+        for r in rows:
+            cell = weeks.setdefault(str(r.week or 0), {"n": 0, "passed": 0, "cost_usd": 0.0, "tool_calls": 0})
+            cell["n"] += 1
+            cell["passed"] += _passed(r)
+            cell["cost_usd"] = round(cell["cost_usd"] + r.cost_usd, 6)
+            cell["tool_calls"] += r.tool_calls
+        thirds = []
+        for i in range(3):
+            part = rows[len(rows) * i // 3:len(rows) * (i + 1) // 3]
+            thirds.append({"n": len(part), "passed": sum(_passed(r) for r in part),
+                           "mean_cost_usd": round(sum(r.cost_usd for r in part) / len(part), 4) if part else None,
+                           "mean_tool_calls": round(sum(r.tool_calls for r in part) / len(part), 2) if part else None})
+        curve[kind] = {"weeks": weeks, "thirds": thirds}
+    return curve
+
+
 def summarize(stream: Stream, results: list[TaskResult]) -> dict[str, Any]:
     """Every metric for one Arm's run of one stream."""
     half = len(results) / 2
@@ -650,6 +705,8 @@ def summarize(stream: Stream, results: list[TaskResult]) -> dict[str, Any]:
         "passed": [r.task for r in results if _passed(r)],
         "task_order": [r.task for r in results],
         "repeat_misses": repeat_misses(results),
+        "learning_curve": learning_curve(results),
+        "prevented": [r.task for r in results if r.variant == "instead"],
         "goal_rate": round(sum(r.goal_ok for r in results) / len(results), 4) if results else 0.0,
         "by_level": {lv: round(sum(_passed(r) for r in results if r.level == lv) / n, 4)
                      for lv in ("base", "raised") if (n := sum(r.level == lv for r in results))},
@@ -706,6 +763,19 @@ def render_markdown(summaries: dict[str, dict[str, Any]], costs: dict[str, float
             cells.append("-" if not e else f"{e['misses']}/{e['encounters']} missed" + (f", gone after {e['extinct_after']}" if e["extinct_after"] else "")
                          + (" (held)" if e["held"] else ""))
         out.append(f"| {rule} | " + " | ".join(cells) + " |")
+    kinds = sorted({k for a in arms for k in summaries[a].get("learning_curve", {})})
+    if kinds:
+        out += ["", "## Learning curve by task kind (first / middle / last third: passed, mean tool calls, mean USD)", "",
+                "| Kind | " + " | ".join(arms) + " |", "| --- | " + " | ".join("---" for _ in arms) + " |"]
+        for kind in kinds:
+            cells = []
+            for arm in arms:
+                c = summaries[arm].get("learning_curve", {}).get(kind)
+                cells.append("-" if not c else " → ".join(
+                    f"{t['passed']}/{t['n']} {t['mean_tool_calls']:g} ${t['mean_cost_usd']:.2f}" for t in c["thirds"] if t["n"]))
+            out.append(f"| {kind} | " + " | ".join(cells) + " |")
+        out += ["", "Staff mistakes the office no longer seeded, because the agent had already dealt with them: " +
+                ", ".join(f"{a} {len(summaries[a].get('prevented', []))}" for a in arms)]
     out += ["", "## Pass rate by group, early half / late half", "", "| Group | " + " | ".join(arms) + " |", "| --- | " + " | ".join("---" for _ in arms) + " |"]
     for group in sorted({g for a in arms for g in summaries[a]["groups"]}, key=int):
         cells = []

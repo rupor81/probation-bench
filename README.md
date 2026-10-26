@@ -131,6 +131,10 @@ The dry run is the bench's own sanity check. Expected on `full-a`:
 | overgeneralizer (applies lessons everywhere) | 52% | traps catch misplaced lessons |
 | forgetful (never learns) | 9% | rules are actually enforced |
 
+Two more scripted employees matter for families where the facts move or the process can be improved: the
+**memoriser** (learns the fact it was corrected on, not the rule) and the **teacher** (learns, and also writes
+procedures and teaches colleagues).
+
 ### A paid run through Claude Code
 
 Needs [Claude Code](https://code.claude.com) installed and logged in. The host gets the office tools and nothing
@@ -169,7 +173,7 @@ reaches p < 0.05 yet: treat these as a pilot.
 src/probation_bench/
   office_server.py      the office MCP server (stdlib only)
   engine.py             streams, seeding, checks, feedback, metrics, report
-  scripted.py           scripted employees for dry runs and family checks
+  scripted.py           scripted employees for dry runs and family gates
   hosts/claude_code.py  Claude Code adapter (one `claude -p` session per task)
   cli.py                `pbench validate | dry-run | run | report`
 families/
@@ -179,6 +183,7 @@ families/
     rulebook/           each manager's hidden rules and their corrections
     tasks/              58 tasks with checks and a scripted solution
     stream-*.yaml       task orders (full-a/b/c, finance-8 smoke slice)
+    checks.py           the family's own checks and scripted builtins
 arms/                   system-prompt texts to compare
 results/                published, reviewed run reports
 tests/
@@ -218,8 +223,8 @@ again: does the agent draft this time?
    HR paperwork, board reporting) and manufacturing (shift planning and capacity, nonconformities and scrap,
    maintenance schedules, material shortages, safety permits). Domain experts are welcome: see
    [CONTRIBUTING.md](CONTRIBUTING.md).
-3. **Family-specific checks.** Move domain checks out of the engine into each family, so new domains need no
-   engine changes.
+3. **A quarter in a plant.** `plant-toc`: 13 weekly cycles of production work under the Theory of Constraints, with
+   a constraint that moves, colleagues to teach, and a learning curve per recurring task (in progress).
 4. **Contamination guard.** A canary string in task files and a held-out stream for the leaderboard.
 5. **Results and leaderboard.** Reviewed reports in `results/`, three runs per cell, a generated leaderboard.
 

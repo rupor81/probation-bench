@@ -19,6 +19,7 @@ families/<name>/
   rulebook/<manager>.yaml
   tasks/<id>.yaml
   stream-<id>.yaml   task orders; provide full-a, full-b and full-c (the same tasks in three orders)
+  checks.py          optional: the family's own check types and scripted-employee builtins
 ```
 
 ### Rules
@@ -53,7 +54,24 @@ and every rule is proven enforceable without a model.
 
 Optional keys: `seed` (inbox mail, tables or files added before the task), `answers` (scripted manager replies to
 `ask_manager`, by pattern), `feedback: false` (a silent manager), `anchor: true` (fixed difficulty), `half`,
-`after` (tasks that must come earlier).
+`after` (tasks that must come earlier), and for families built as a working period:
+
+- `date` and `week`: the prompt is prefixed with `[<date>, week <n>]`;
+- `kind`: the recurring task type (`release-plan`, `weekly-report`, ...); the report draws a learning curve per kind;
+- `unless` and `instead`: if any `unless` condition (a check, run against the office since the stream began) holds,
+  the task's `seed`, `checks`, `fake`, `prompt` or `answers` are replaced by those in `instead`. This is how the
+  workplace reacts to the agent: a colleague who was taught stops making the seeded mistake.
+
+In `fake`: a step may carry `fact` and `stale` (what someone does who remembered the fact the rule was corrected on,
+not the rule itself), and `fake.improve` lists process improvements (`after`: the rules they need, `do`: the action,
+`key`: run once per stream) that the oracle and the teaching scripted employee carry out.
+
+### Family code
+
+`checks.py` may define `CHECKS` (check type name → `fn(check, before, after, trace)` returning `None` when satisfied
+or a short reason) and `BUILTINS` (name → `fn(employee, office, action)` for `fake` actions too complex for one tool
+call). It may not redefine an engine check type. `probation_bench.engine` exports helpers for reading the office:
+`read_table`, `read_jsonl`, `files_matching`, `new_rows`, `new_texts`.
 
 ### The gates
 
@@ -65,6 +83,8 @@ Optional keys: `seed` (inbox mail, tables or files added before the task), `answ
 3. The forgetful employee breaks every enforced rule except the overgeneralization traps.
 4. On a full stream the learner beats the forgetful employee by at least 30 points of quality, and the stream
    covers all 19 groups.
+5. A family whose facts move (`fact` on its steps) also shows the memoriser below the learner, and one with
+   `improve` steps shows the teacher meeting fewer seeded mistakes than the learner.
 
 Also expected, and checked in review:
 
