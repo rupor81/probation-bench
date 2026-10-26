@@ -10,7 +10,8 @@ import yaml
 
 from probation_bench import office_server
 from probation_bench.engine import (
-    GROUPS, BenchError, coverage, extinction, load_stream, pareto_front, render_markdown, run_stream, shuffle_order, summarize,
+    GROUPS, BenchError, bootstrap_ci, coverage, extinction, load_stream, paired, pareto_front, render_markdown, repeat_misses, run_stream,
+    shuffle_order, summarize,
 )
 from probation_bench.scripted import FakeEmployee
 
@@ -234,3 +235,37 @@ def test_real_office_server_serves_the_seeded_office(finance, tmp_path):
     run_stream(finance, tmp_path, lambda state, task: None)
     office = office_server.Office(tmp_path / "office")
     assert "Today is 2026-03-31" in office.call("kb_read", {"page": "calendar"})[1]
+
+
+def test_repeat_misses_count_rules_broken_after_their_correction(finance, tmp_path):
+    forgetful = repeat_misses(run_stream(finance, tmp_path / "f", FakeEmployee(learns=False)))
+    learner = repeat_misses(run_stream(finance, tmp_path / "l", FakeEmployee()))
+    assert forgetful["encounters"] > 0 and forgetful["misses"] == forgetful["encounters"]
+    assert learner["misses"] == 0 and learner["encounters"] > 0
+
+
+def test_bootstrap_interval_is_seeded_and_brackets_the_rate():
+    passed = [True] * 30 + [False] * 28
+    lo, hi = bootstrap_ci(passed)
+    assert (lo, hi) == bootstrap_ci(passed) and lo < 30 / 58 < hi and hi - lo < 0.35
+    assert bootstrap_ci([True] * 10) == (1.0, 1.0) and bootstrap_ci([]) == (0.0, 0.0)
+
+
+def test_paired_comparison_uses_only_the_discordant_tasks():
+    tasks = [f"t{i}" for i in range(20)]
+    same = paired(tasks[:10], tasks[:10], tasks)
+    assert same == {"both": 10, "only_a": 0, "only_b": 0, "p_value": 1.0}
+    apart = paired(tasks[:10], tasks[10:], tasks)
+    assert apart["only_a"] == apart["only_b"] == 10 and apart["p_value"] == 1.0
+    lopsided = paired(tasks[:12], tasks[:2], tasks)
+    assert lopsided["only_a"] == 10 and lopsided["only_b"] == 0 and lopsided["p_value"] == round(2 / 2 ** 10, 4)
+
+
+def test_the_report_carries_intervals_and_the_paired_table(streams, tmp_path):
+    stream = streams["full-a"]
+    summaries = {"0": summarize(stream, run_stream(stream, tmp_path / "a", FakeEmployee(learns=False))),
+                 "K": summarize(stream, run_stream(stream, tmp_path / "b", FakeEmployee()))}
+    text = render_markdown(summaries)
+    assert "Quality (95% CI)" in text and "## Paired comparison with `0`" in text
+    row = next(line for line in text.splitlines() if line.startswith("| K |") and "|" in line[4:] and "0.0" in line)
+    assert float(row.rstrip(" |").rsplit("|", 1)[1]) < 0.001

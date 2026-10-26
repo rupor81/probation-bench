@@ -18,7 +18,7 @@ numbers: one or two runs per cell, and single runs differ by one or two tasks.
 Arm `P` is a private operating text (a page of working principles) whose wording is not published; it is reported
 so the model comparison has a common Arm. Arms `0` and `K` are in [`arms/`](../../arms/).
 
-## What the pilot shows
+## What the pilot suggests
 
 - **Instructions matter only in the late stream.** On Opus 5.5 the first half is flat across Arms (14-16). The gap
   opens in the second half, where corrections have accumulated: `0` 12, `K` 13, `P` 17-18.
@@ -28,9 +28,26 @@ so the model comparison has a common Arm. Arms `0` and `K` are in [`arms/`](../.
 - **Cost.** Fable 5.1 matches Opus 5.5 on quality at 2.7 times the cost; Sonnet 5.5 costs 40% of Opus and
   passes 7-8 tasks fewer.
 
+## How sure are we
+
+Not sure yet. A single run's pass rate carries a 95% interval of about ±12 points (bootstrap over tasks). Comparing
+two runs task by task (exact McNemar test on the tasks only one of them passed):
+
+| Comparison | Only the first passed | Only the second passed | p |
+| --- | --- | --- | --- |
+| Opus `K` vs `0` | 5 | 2 | 0.45 |
+| Opus `P` run 1 vs `0` | 7 | 1 | 0.07 |
+| Opus `P` run 2 vs `0` | 7 | 2 | 0.18 |
+| Sonnet vs Opus, both `P` | 5 | 13 | 0.10 |
+| Fable vs Opus, both `P` | 2 | 3 | 1.00 |
+
+No difference reaches p < 0.05. The direction is consistent (both `P` runs beat `0` on the same tasks), which is
+what three runs per cell over the orders `full-b` and `full-c` should confirm or refute.
+
 ## Files
 
-- `report.md`, `report.json`: every metric per run (extinction per rule, groups early and late, budget).
+- `report-opus-arms.md`, `report-models-arm-p.md`: every metric per run (95% interval, paired test, extinction per
+  rule, groups early and late, budget); `report.json` holds the same for all six runs.
 - `runs/<model>/<arm>-run<n>.json`: the graded results of each task. Session transcripts and office snapshots are
   not published.
 

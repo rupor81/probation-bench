@@ -160,7 +160,8 @@ Six full runs of the 58-task stream, October 2026 ([details](results/2026-10-pil
 | Sonnet 5.5 | `P` | 24 | 12 of 26 | 5.90 |
 
 Instructions changed nothing in the first half of the stream and a lot in the second, once corrections had piled
-up. The model mattered most for not repeating a corrected mistake. One or two runs per cell: treat these as a pilot.
+up. The model mattered most for not repeating a corrected mistake. One or two runs per cell, and no paired difference
+reaches p < 0.05 yet: treat these as a pilot.
 
 ## Repository layout
 

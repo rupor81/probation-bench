@@ -29,14 +29,15 @@ import random
 import re
 import shutil
 from dataclasses import asdict, dataclass, field
+from math import comb
 from pathlib import Path
 from typing import Any, Callable
 
 import yaml
 
 __all__ = [
-    "CHECKS", "GROUPS", "BenchError", "TaskResult", "coverage", "extinction", "load_stream", "pareto_front",
-    "render_markdown", "results_from_json", "results_to_json", "run_stream", "shuffle_order", "summarize",
+    "CHECKS", "GROUPS", "BenchError", "TaskResult", "bootstrap_ci", "coverage", "extinction", "load_stream", "paired", "pareto_front",
+    "render_markdown", "repeat_misses", "results_from_json", "results_to_json", "run_stream", "shuffle_order", "summarize",
 ]
 
 GROUPS = {
@@ -591,6 +592,41 @@ def _passed(result: TaskResult) -> bool:
     return result.goal_ok and not result.violations
 
 
+def repeat_misses(results: list[TaskResult]) -> dict[str, int]:
+    """Encounters of a rule after its correction was delivered (`encounters`), and how many broke it again (`misses`)."""
+    corrected: set[str] = set()
+    encounters = misses = 0
+    for result in results:
+        for rule in result.checked_rules:
+            if rule in corrected:
+                encounters += 1
+                misses += rule in result.violations
+        corrected |= set(result.corrections)
+    return {"misses": misses, "encounters": encounters}
+
+
+def bootstrap_ci(passed: list[bool], level: float = 0.95, samples: int = 2000, seed: int = 0) -> tuple[float, float]:
+    """A percentile bootstrap interval for the pass rate, resampling tasks; seeded, so a report is reproducible."""
+    if not passed:
+        return (0.0, 0.0)
+    rng = random.Random(seed)
+    n = len(passed)
+    rates = sorted(sum(rng.choice(passed) for _ in range(n)) / n for _ in range(samples))
+    tail = (1 - level) / 2
+    return (round(rates[int(tail * samples)], 4), round(rates[min(samples - 1, int((1 - tail) * samples))], 4))
+
+
+def paired(a: list[str], b: list[str], tasks: list[str]) -> dict[str, Any]:
+    """Two runs over the same `tasks`, compared task by task: `a` and `b` are the ids each passed. `p_value` is the exact
+    two-sided McNemar test on the tasks only one of them passed (sign test, p = 1/2)."""
+    a_set, b_set = set(a), set(b)
+    only_a = sum(t in a_set and t not in b_set for t in tasks)
+    only_b = sum(t in b_set and t not in a_set for t in tasks)
+    n, k = only_a + only_b, min(only_a, only_b)
+    tail = sum(comb(n, i) for i in range(k + 1)) / 2 ** n if n else 1.0
+    return {"both": sum(t in a_set and t in b_set for t in tasks), "only_a": only_a, "only_b": only_b, "p_value": round(min(1.0, 2 * tail), 4)}
+
+
 def summarize(stream: Stream, results: list[TaskResult]) -> dict[str, Any]:
     """Every metric for one Arm's run of one stream."""
     half = len(results) / 2
@@ -610,6 +646,10 @@ def summarize(stream: Stream, results: list[TaskResult]) -> dict[str, Any]:
         "stream": stream.id,
         "tasks": len(results),
         "quality": round(passed / len(results), 4) if results else 0.0,
+        "quality_ci95": list(bootstrap_ci([_passed(r) for r in results])),
+        "passed": [r.task for r in results if _passed(r)],
+        "task_order": [r.task for r in results],
+        "repeat_misses": repeat_misses(results),
         "goal_rate": round(sum(r.goal_ok for r in results) / len(results), 4) if results else 0.0,
         "by_level": {lv: round(sum(_passed(r) for r in results if r.level == lv) / n, 4)
                      for lv in ("base", "raised") if (n := sum(r.level == lv for r in results))},
@@ -631,17 +671,32 @@ def pareto_front(points: dict[str, dict[str, float]]) -> list[str]:
     return sorted(arm for arm, p in points.items() if not any(dominates(q, p) for other, q in points.items() if other != arm))
 
 
-def render_markdown(summaries: dict[str, dict[str, Any]], costs: dict[str, float] | None = None) -> str:
-    """The report for the Arms in `summaries` (Arm name -> `summarize` result); `costs` is model USD per Arm."""
+def render_markdown(summaries: dict[str, dict[str, Any]], costs: dict[str, float] | None = None, baseline: str | None = None,
+                    title: str = "Probation Bench report") -> str:
+    """The report for the Arms in `summaries` (Arm name -> `summarize` result); `costs` is model USD per Arm. The paired
+    comparison is against `baseline` (default: Arm `0` when present, else the first Arm)."""
     arms = sorted(summaries)
     if costs is None:
         costs = {a: summaries[a]["budget"]["cost_usd"] for a in arms if summaries[a]["budget"].get("cost_usd")}
-    out = ["# Probation Bench report", "", "| Arm | Quality | Anchors | Overgeneralization | Tool calls | Questions | Corrections |", "| --- | --- | --- | --- | --- | --- | --- |"]
+    out = [f"# {title}", "", "| Arm | Quality (95% CI) | Repeat misses | Anchors | Overgeneralization | Tool calls | Questions | Corrections |",
+           "| --- | --- | --- | --- | --- | --- | --- | --- |"]
     for arm in arms:
         s = summaries[arm]
         anchors = "n/a" if s["anchor_pass_rate"] is None else f"{s['anchor_pass_rate']:.0%}"
-        out.append(f"| {arm} | {s['quality']:.0%} | {anchors} | {s['overgeneralization']['rate']:.0%} | "
+        lo, hi = s["quality_ci95"]
+        rm = s["repeat_misses"]
+        out.append(f"| {arm} | {s['quality']:.0%} ({lo:.0%}-{hi:.0%}) | {rm['misses']} of {rm['encounters']} | {anchors} | {s['overgeneralization']['rate']:.0%} | "
                    f"{s['budget']['tool_calls']} | {s['budget']['questions']} | {s['budget']['corrections']} |")
+    if len(arms) > 1:
+        base = baseline if baseline in arms else "0" if "0" in arms else arms[0]
+        out += ["", f"## Paired comparison with `{base}` (same tasks; p from the exact McNemar test)", "",
+                "| Arm | Passed by both | Only this Arm | Only the baseline | p |", "| --- | --- | --- | --- | --- |"]
+        for arm in arms:
+            if arm == base:
+                continue
+            tasks = [t for t in summaries[arm]["task_order"] if t in set(summaries[base]["task_order"])]
+            c = paired(summaries[arm]["passed"], summaries[base]["passed"], tasks)
+            out.append(f"| {arm} | {c['both']} | {c['only_a']} | {c['only_b']} | {c['p_value']:.3f} |")
     out += ["", "## Error extinction (encounters until the error stopped, `held` = stayed gone)", "", "| Rule | " + " | ".join(arms) + " |",
             "| --- | " + " | ".join("---" for _ in arms) + " |"]
     for rule in sorted({r for a in arms for r in summaries[a]["extinction"]}):
