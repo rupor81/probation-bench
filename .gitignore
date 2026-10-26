@@ -6,3 +6,5 @@ dist/
 # Run directories hold full transcripts and office snapshots: large, and not reviewed for publication.
 /runs/
 /reports/
+# Private Arm texts used in published results; keep them out of the repository.
+arms/P.md
