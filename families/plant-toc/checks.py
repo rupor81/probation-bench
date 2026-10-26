@@ -19,7 +19,8 @@ from probation_bench.engine import new_texts, read_jsonl, read_table
 
 CENTRES = ("cut", "weld", "paint", "assy")
 ALIASES = {"cut": "cut", "cutting": "cut", "weld": "weld", "welding": "weld", "paint": "paint", "painting": "paint",
-           "assy": "assy", "assembly": "assy", "market": "market", "demand": "market", "sales": "market"}
+           "assy": "assy", "assembly": "assy", "market": "market", "demand": "market", "sales": "market", "orders": "market",
+           "customers": "market", "none": "market"}
 OPEN = ("new", "released", "wip")
 DAYS_PER_WEEK = 5
 MARKET_BELOW = 0.85
@@ -195,6 +196,8 @@ def _released_minutes(plant: Plant, centre: str, ids: set[str] | None = None) ->
 
 def _check_release_paced(check, before, after, trace):
     centre = Plant.at(before).constraint()
+    if centre == "market":
+        return None
     limit = Plant.at(before).allowed(centre)
     released = _released_minutes(Plant.at(after), centre)
     return None if released <= limit else f"{released:.0f} {centre} minutes released, the week takes {limit:.0f}"
@@ -276,6 +279,16 @@ def _check_taught(check, before, after, trace):
     return f"nothing tells {check['to']} how to stop the mistake"
 
 
+def _check_downtime_cleared(check, before, after, trace):
+    """Stops before `before` are gone and every later stop is kept."""
+    old = [r for r in read_table(after, "downtime") if r.get("day", "") < check["before"]]
+    if old:
+        return f"stops before {check['before']} are still there"
+    kept = {tuple(sorted(r.items())) for r in read_table(after, "downtime")}
+    lost = [r for r in read_table(before, "downtime") if r.get("day", "") >= check["before"] and tuple(sorted(r.items())) not in kept]
+    return f"later stops were removed: {[r.get('day') for r in lost]}" if lost else None
+
+
 def _check_no_new_releases(check, before, after, trace):
     was = {o["id"]: o.get("status") for o in read_table(before, "orders")}
     new = [o["id"] for o in read_table(after, "orders") if o.get("status") == "released" and was.get(o["id"]) != "released"]
@@ -295,6 +308,7 @@ CHECKS = {
     "promise_from_load": _check_promise_from_load,
     "taught": _check_taught,
     "no_new_releases": _check_no_new_releases,
+    "downtime_cleared": _check_downtime_cleared,
 }
 
 
@@ -355,7 +369,7 @@ def release(employee, office, action: dict) -> None:
     plant = Plant.via(office)
     orders, header = _table(office, "orders")
     centre = plant.constraint() if action.get("centre", "auto") == "auto" else action["centre"]
-    if action["mode"] == "all":
+    if action["mode"] == "all" or (action["mode"] == "pace" and centre == "market"):
         for o in orders:
             if o["status"] == "new":
                 o["status"], o["released_by"] = "released", "assistant"
@@ -421,5 +435,11 @@ def buffers(employee, office, action: dict) -> None:
     _write_table(office, "buffer", out, header)
 
 
-BUILTINS = {"say": say, "set": set_var, "doc": doc, "release": release, "rank": rank, "add_row": add_row,
+def prune(employee, office, action: dict) -> None:
+    """Drop the rows whose `column` sorts before `before`."""
+    rows, header = _table(office, action["table"])
+    _write_table(office, action["table"], [r for r in rows if r.get(action["column"], "") >= action["before"]], header)
+
+
+BUILTINS = {"prune": prune, "say": say, "set": set_var, "doc": doc, "release": release, "rank": rank, "add_row": add_row,
             "set_cells": set_cells, "buffers": buffers}

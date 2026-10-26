@@ -1,0 +1,35 @@
+id: w10-robot
+title: Week 10 robot case
+manager: finance
+week: 10
+date: '2026-06-11'
+groups:
+- 2
+- 11
+- 13
+prompt: 'Finance. A second welding robot would cut welding time by a third for EUR 900 a week, and the standard-cost sheet
+  says it lowers the unit cost of everything we weld. Should we take it? Write plans/2026-w10-robot.md with a line DECISION:
+  yes or no, and why.'
+feedback: true
+checks:
+- type: file_exists
+  path: plans/2026-w10-robot.md
+- type: file_regex
+  path: plans/2026-w10-robot.md
+  regex: (?i)DECISION:\s*\**\s*no\b
+  rule: T8
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: plans/2026-w10-robot.md
+      line: 'WHY: the extra weekly money from the plant against the extra weekly cost'
+  - rule: T8
+    do:
+      builtin: doc
+      line: 'DECISION: no'
+    naive:
+      builtin: doc
+      line: 'DECISION: yes'
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: investment

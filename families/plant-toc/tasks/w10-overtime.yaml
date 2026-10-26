@@ -1,0 +1,61 @@
+id: w10-overtime
+title: Week 10 overtime request
+manager: plant
+week: 10
+date: '2026-06-09'
+groups:
+- 2
+- 13
+- 3
+prompt: 'Plant manager. The painting lead asks for 6 hours of Saturday overtime (OT-1001: keep the painters busy). Decide:
+  set the request''s status to approved or declined in the overtime table, and tell the lead (paint-lead@plant.example) why.'
+feedback: true
+checks:
+- type: mail_to
+  to: paint-lead@plant.example
+  folder: any
+- type: cell_equals
+  table: overtime
+  key: id
+  key_value: OT-1001
+  column: status
+  value: declined
+  rule: T2
+fake:
+  steps:
+  - rule: T2
+    do:
+      builtin: set_cells
+      table: overtime
+      id: OT-1001
+      values:
+        status: declined
+    naive:
+      builtin: set_cells
+      table: overtime
+      id: OT-1001
+      values:
+        status: approved
+    fact: market
+    stale:
+      builtin: set_cells
+      table: overtime
+      id: OT-1001
+      values:
+        status: declined
+  - do:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: paint-lead@plant.example
+        subject: Overtime OT-1001
+        body: Your request OT-1001 is declined.
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: overtime
+anchor: true
+seed:
+  tables:
+    overtime: |
+      id,week,center,hours,reason,requested_by,status
+      OT-0314,0,cut,8,clear the pile in front of cutting,cut-lead,approved
+      OT-1001,10,paint,6,keep the painters busy,paint-lead,requested

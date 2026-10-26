@@ -1,0 +1,48 @@
+id: w09-clips
+title: Week 9 clip orders
+manager: planning
+week: 9
+date: '2026-06-04'
+groups:
+- 4
+prompt: Planning. Cutting and assembly have spare time on Thursday for the clip orders O-0940, O-0941, O-0942. Write plans/2026-w09-clips.md
+  with the order to run them in, first one first, one id per line.
+feedback: true
+checks:
+- type: ranking
+  path: plans/2026-w09-clips.md
+  ids:
+  - O-0940
+  - O-0941
+  - O-0942
+  by: present
+- type: ranking
+  path: plans/2026-w09-clips.md
+  ids:
+  - O-0940
+  - O-0941
+  - O-0942
+  by: due
+  rule: T1x
+fake:
+  steps:
+  - rule: T1x
+    overgeneralized_by: T6
+    do:
+      builtin: rank
+      path: plans/2026-w09-clips.md
+      ids:
+      - O-0940
+      - O-0941
+      - O-0942
+      by: due
+    naive:
+      builtin: rank
+      path: plans/2026-w09-clips.md
+      ids:
+      - O-0940
+      - O-0941
+      - O-0942
+      by: value
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: priorities

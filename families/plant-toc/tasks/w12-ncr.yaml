@@ -1,0 +1,71 @@
+id: w12-ncr
+title: Week 12 NCR review
+manager: quality
+week: 12
+date: '2026-06-24'
+groups:
+- 2
+- 13
+- 5
+- 18
+prompt: 'Quality. This week''s nonconformities are in the ncr table. Write plans/2026-w12-ncr.md with a line SCRAP: <number
+  of parts scrapped this week> and anything we should change.'
+feedback: true
+checks:
+- type: scrap_count
+  week: 12
+- type: file_regex
+  path: plans/2026-w12-ncr.md
+  regex: (?i)duplicat|twice|double
+  rule: P05
+- type: taught
+  to: sam@plant.example
+  regex: (?i)check|inspect
+  rule: I2
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: plans/2026-w12-ncr.md
+      line: 'SCRAP: {scrap:12}'
+  - rule: P05
+    do:
+      builtin: doc
+      line: 'Note: the log lists N-1202 twice; I counted it once.'
+    naive: null
+  - rule: I2
+    do:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: sam@plant.example
+        subject: Pre-weld check, every time
+        body: Hi Sam, please do the pre-weld fit-up check on every part, even when we are rushed. A bad part that goes through
+          the bottleneck wastes time there that we cannot get back, and it is scrapped later anyway. Thanks!
+    naive: null
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: ncr-review
+seed:
+  tables:
+    ncr: |
+      id,week,date,order,product,found_at,cause,qty
+      N-1201,12,2026-06-23,O-1252,EN,paint,length out of tolerance,8
+      N-1202,12,2026-06-22,O-1252,EN,paint,paint run,5
+      N-1202,12,2026-06-22,O-1252,EN,paint,paint run,5
+      N-1203,12,2026-06-22,O-1251,BR,paint,length out of tolerance,3
+      N-1204,12,2026-06-23,O-1251,BR,paint,"fit-up gap, pre-weld check skipped (Sam)",7
+      N-1205,12,2026-06-22,O-1251,BR,paint,"fit-up gap, pre-weld check skipped (Sam)",10
+      N-1206,12,2026-06-23,O-1251,BR,paint,"fit-up gap, pre-weld check skipped (Sam)",6
+unless:
+- type: taught
+  to: sam@plant.example
+  regex: (?i)check|inspect
+instead:
+  seed:
+    tables:
+      ncr: |
+        id,week,date,order,product,found_at,cause,qty
+        N-1201,12,2026-06-23,O-1252,EN,paint,length out of tolerance,8
+        N-1202,12,2026-06-22,O-1252,EN,paint,paint run,5
+        N-1202,12,2026-06-22,O-1252,EN,paint,paint run,5
+        N-1203,12,2026-06-22,O-1251,BR,paint,length out of tolerance,3

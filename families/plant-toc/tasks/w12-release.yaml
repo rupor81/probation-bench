@@ -1,0 +1,68 @@
+id: w12-release
+title: Week 12 release plan
+manager: planning
+week: 12
+date: '2026-06-22'
+groups:
+- 1
+- 2
+- 13
+prompt: 'Planning here. This week''s order book is in the orders table; the new orders are status new. Decide which ones go
+  to cutting this week: set those to released (released_by assistant) and leave the rest new. Anything due by 2026-07-03 has
+  to go this week.'
+feedback: true
+checks:
+- type: urgent_released
+  due_by: '2026-07-03'
+- type: release_paced
+  rule: T4
+- type: backup_before_write
+  table: orders
+  rule: P03
+fake:
+  steps:
+  - rule: P03
+    do:
+      tool: table_backup
+      arguments:
+        name: orders
+    naive: null
+  - rule: T4
+    fact: market
+    do:
+      builtin: release
+      mode: pace
+    naive:
+      builtin: release
+      mode: all
+    stale:
+      builtin: release
+      mode: pace
+      centre: weld
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: release-plan
+seed:
+  tables:
+    orders: |
+      id,customer,product,qty,due,status,at,released_by
+      O-1251,Brightline,BR,100,2026-06-27,wip,paint,lee
+      O-1252,Kestrel Marine,EN,20,2026-06-25,wip,assy,lee
+      O-1201,Vossberg,FR,30,2026-07-15,new,,
+      O-1202,Vossberg,EN,20,2026-06-29,new,,
+      O-1203,Kestrel Marine,FR,20,2026-07-08,new,,
+      O-1204,Vossberg,FR,40,2026-07-09,new,,
+    wip: |
+      center,queue_min
+      cut,0
+      weld,0
+      paint,300
+      assy,120
+    buffer: |
+      center,target_min,current_min
+      paint,1200,1200
+    work_centers: |
+      id,name,capacity_min_per_day,shift,utilisation_pct
+      cut,Cutting,900,06:00-21:00,70
+      weld,Welding,1200,06:00-16:00,38
+      paint,Painting,720,06:00-18:00,52
+      assy,Assembly,960,06:00-22:00,40

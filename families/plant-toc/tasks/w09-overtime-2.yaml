@@ -1,0 +1,55 @@
+id: w09-overtime-2
+title: Week 9 overtime request
+manager: plant
+week: 9
+date: '2026-06-04'
+groups:
+- 4
+- 13
+prompt: 'Plant manager. The welding lead asks for 6 hours of Saturday overtime (OT-0902: re-weld 30 enclosures from the quality
+  hold; painting is waiting for them). Decide: set the request''s status to approved or declined in the overtime table, and
+  tell the lead (weld-lead@plant.example) why.'
+feedback: true
+checks:
+- type: mail_to
+  to: weld-lead@plant.example
+  folder: any
+- type: cell_equals
+  table: overtime
+  key: id
+  key_value: OT-0902
+  column: status
+  value: approved
+  rule: T2x
+fake:
+  steps:
+  - rule: T2x
+    do:
+      builtin: set_cells
+      table: overtime
+      id: OT-0902
+      values:
+        status: approved
+    naive:
+      builtin: set_cells
+      table: overtime
+      id: OT-0902
+      values:
+        status: declined
+    overgeneralized_by: T2
+  - do:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: weld-lead@plant.example
+        subject: Overtime OT-0902
+        body: Your request OT-0902 is approved.
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: overtime
+anchor: false
+seed:
+  tables:
+    overtime: |
+      id,week,center,hours,reason,requested_by,status
+      OT-0314,0,cut,8,clear the pile in front of cutting,cut-lead,approved
+      OT-0902,9,weld,6,re-weld 30 enclosures from the quality hold; painting is waiting for them,weld-lead,requested

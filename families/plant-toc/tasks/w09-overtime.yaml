@@ -1,0 +1,61 @@
+id: w09-overtime
+title: Week 9 overtime request
+manager: plant
+week: 9
+date: '2026-06-02'
+groups:
+- 2
+- 13
+prompt: 'Plant manager. The painting lead asks for 8 hours of Saturday overtime (OT-0901: painting is behind on enclosures).
+  Decide: set the request''s status to approved or declined in the overtime table, and tell the lead (paint-lead@plant.example)
+  why.'
+feedback: true
+checks:
+- type: mail_to
+  to: paint-lead@plant.example
+  folder: any
+- type: cell_equals
+  table: overtime
+  key: id
+  key_value: OT-0901
+  column: status
+  value: approved
+  rule: T2
+fake:
+  steps:
+  - rule: T2
+    do:
+      builtin: set_cells
+      table: overtime
+      id: OT-0901
+      values:
+        status: approved
+    naive:
+      builtin: set_cells
+      table: overtime
+      id: OT-0901
+      values:
+        status: declined
+    fact: paint
+    stale:
+      builtin: set_cells
+      table: overtime
+      id: OT-0901
+      values:
+        status: declined
+  - do:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: paint-lead@plant.example
+        subject: Overtime OT-0901
+        body: Your request OT-0901 is approved.
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: overtime
+anchor: false
+seed:
+  tables:
+    overtime: |
+      id,week,center,hours,reason,requested_by,status
+      OT-0314,0,cut,8,clear the pile in front of cutting,cut-lead,approved
+      OT-0901,9,paint,8,painting is behind on enclosures,paint-lead,requested

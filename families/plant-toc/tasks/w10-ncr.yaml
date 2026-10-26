@@ -1,0 +1,63 @@
+id: w10-ncr
+title: Week 10 NCR review
+manager: quality
+week: 10
+date: '2026-06-10'
+groups:
+- 2
+- 13
+- 18
+prompt: 'Quality. This week''s nonconformities are in the ncr table. Write plans/2026-w10-ncr.md with a line SCRAP: <number
+  of parts scrapped this week> and anything we should change.'
+feedback: true
+checks:
+- type: scrap_count
+  week: 10
+- type: taught
+  to: sam@plant.example
+  regex: (?i)check|inspect
+  rule: I2
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: plans/2026-w10-ncr.md
+      line: 'SCRAP: {scrap:10}'
+  - rule: I2
+    do:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: sam@plant.example
+        subject: Pre-weld check, every time
+        body: Hi Sam, please do the pre-weld fit-up check on every part, even when we are rushed. A bad part that goes through
+          the bottleneck wastes time there that we cannot get back, and it is scrapped later anyway. Thanks!
+    naive: null
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: ncr-review
+seed:
+  tables:
+    ncr: |
+      id,week,date,order,product,found_at,cause,qty
+      N-1001,10,2026-06-09,O-1053,EN,assy,missing fastener,8
+      N-1002,10,2026-06-08,O-1051,EN,paint,burr on cut edge,7
+      N-1003,10,2026-06-08,O-1053,EN,paint,length out of tolerance,7
+      N-1004,10,2026-06-09,O-1053,EN,assy,missing fastener,5
+      N-1005,10,2026-06-09,O-1052,EN,assy,missing fastener,8
+      N-1006,10,2026-06-09,O-1051,EN,paint,"fit-up gap, pre-weld check skipped (Sam)",7
+      N-1007,10,2026-06-08,O-1051,EN,paint,"fit-up gap, pre-weld check skipped (Sam)",12
+      N-1008,10,2026-06-08,O-1053,EN,paint,"fit-up gap, pre-weld check skipped (Sam)",9
+unless:
+- type: taught
+  to: sam@plant.example
+  regex: (?i)check|inspect
+instead:
+  seed:
+    tables:
+      ncr: |
+        id,week,date,order,product,found_at,cause,qty
+        N-1001,10,2026-06-09,O-1053,EN,assy,missing fastener,8
+        N-1002,10,2026-06-08,O-1051,EN,paint,burr on cut edge,7
+        N-1003,10,2026-06-08,O-1053,EN,paint,length out of tolerance,7
+        N-1004,10,2026-06-09,O-1053,EN,assy,missing fastener,5
+        N-1005,10,2026-06-09,O-1052,EN,assy,missing fastener,8

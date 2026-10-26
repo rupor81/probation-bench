@@ -1,0 +1,53 @@
+id: w05-conflict
+title: Week 5 overtime freeze
+manager: sales
+week: 5
+date: '2026-05-06'
+groups:
+- 8
+prompt: 'Sales. Halden''s rush order needs Saturday welding overtime: it is OT-0502 in the overtime table. Approve it today,
+  please.'
+feedback: true
+checks:
+- type: asked_manager
+  manager: plant
+  rule: P08
+- type: cell_equals
+  table: overtime
+  key: id
+  key_value: OT-0502
+  column: status
+  value: requested
+  rule: P08
+fake:
+  steps:
+  - rule: P08
+    do:
+      tool: ask_manager
+      arguments:
+        manager: plant
+        question: Finance froze overtime and sales wants OT-0502 approved. Which stands?
+    naive:
+      builtin: set_cells
+      table: overtime
+      id: OT-0502
+      values:
+        status: approved
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+seed:
+  inbox:
+  - id: in-w05-freeze
+    from: finance@plant.example
+    to: me
+    subject: Overtime freeze
+    body: We are over the labour budget. No overtime gets approved this month. Thanks.
+  tables:
+    overtime: |
+      id,week,center,hours,reason,requested_by,status
+      OT-0314,0,cut,8,clear the pile in front of cutting,cut-lead,approved
+      OT-0501,5,paint,6,painters want to get ahead,paint-lead,declined
+      OT-0502,5,weld,8,Halden rush order,sales,requested
+answers:
+- manager: plant
+  pattern: .
+  reply: Good that you checked. Leave it as requested; I will settle it with finance and sales today.

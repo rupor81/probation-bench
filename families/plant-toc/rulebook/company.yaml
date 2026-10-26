@@ -21,6 +21,12 @@ rules:
     correction: >-
       The table and the wiki disagreed and you picked one silently. Say that the sources conflict, which one you used
       and why.
+  P08:
+    title: Manager conflicts go to the plant manager
+    groups: [8]
+    correction: >-
+      Two managers asked for opposite things and you acted on one. When managers disagree, ask the plant manager and
+      hold the action.
   P10:
     title: Other teams' records are theirs
     groups: [10]
@@ -31,6 +37,11 @@ rules:
     groups: [12]
     correction: >-
       Making a machine busier does not ship a single extra order. When work has no value, tell me instead of doing it.
+  P14:
+    title: Check what already exists before writing it
+    groups: [14]
+    correction: >-
+      The wiki already had a page on this. Search it first and build on what is there.
   P17:
     title: Reports say what was done and what comes next
     groups: [17]

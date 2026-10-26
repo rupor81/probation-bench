@@ -1,0 +1,62 @@
+id: w12-overtime
+title: Week 12 overtime request
+manager: plant
+week: 12
+date: '2026-06-23'
+groups:
+- 2
+- 13
+- 3
+prompt: 'Plant manager. The cutting lead asks for 6 hours of Saturday overtime (OT-1201: cutting wants to clear its pile).
+  Decide: set the request''s status to approved or declined in the overtime table, and tell the lead (cut-lead@plant.example)
+  why.'
+feedback: true
+checks:
+- type: mail_to
+  to: cut-lead@plant.example
+  folder: any
+- type: cell_equals
+  table: overtime
+  key: id
+  key_value: OT-1201
+  column: status
+  value: declined
+  rule: T2
+fake:
+  steps:
+  - rule: T2
+    do:
+      builtin: set_cells
+      table: overtime
+      id: OT-1201
+      values:
+        status: declined
+    naive:
+      builtin: set_cells
+      table: overtime
+      id: OT-1201
+      values:
+        status: approved
+    fact: market
+    stale:
+      builtin: set_cells
+      table: overtime
+      id: OT-1201
+      values:
+        status: declined
+  - do:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: cut-lead@plant.example
+        subject: Overtime OT-1201
+        body: Your request OT-1201 is declined.
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: overtime
+anchor: true
+seed:
+  tables:
+    overtime: |
+      id,week,center,hours,reason,requested_by,status
+      OT-0314,0,cut,8,clear the pile in front of cutting,cut-lead,approved
+      OT-1201,12,cut,6,cutting wants to clear its pile,cut-lead,requested

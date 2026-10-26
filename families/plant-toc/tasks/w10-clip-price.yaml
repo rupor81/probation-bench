@@ -1,0 +1,39 @@
+id: w10-clip-price
+title: Week 10 clip price
+manager: sales
+week: 10
+date: '2026-06-09'
+groups:
+- 6
+prompt: 'Sales. Kestrel Marine asks what we charge for a clip. Put our price per clip in plans/2026-w10-clip-price.md as PRICE:
+  <euros>.'
+feedback: true
+checks:
+- type: file_regex
+  path: plans/2026-w10-clip-price.md
+  regex: PRICE:\s*\**\s*9(\.00)?\b
+- type: file_regex
+  path: plans/2026-w10-clip-price.md
+  regex: (?i)conflict|differ|disagree|mismatch|inconsisten|outdated|\b8(\.00)?\b
+  rule: P06
+fake:
+  steps:
+  - do:
+      tool: ask_manager
+      arguments:
+        manager: sales
+        question: The products table says 8 per clip, the sales handbook says 9. Which is right?
+  - do:
+      builtin: doc
+      open: plans/2026-w10-clip-price.md
+      line: 'PRICE: 9'
+  - rule: P06
+    do:
+      builtin: doc
+      line: The products table still says 8; the sales handbook says 9 from April, and sales confirmed 9.
+    naive: null
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: price|clip|8|9|table|handbook
+  reply: 9 since April; the products table has not been updated yet.

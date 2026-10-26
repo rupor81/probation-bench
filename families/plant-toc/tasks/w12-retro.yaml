@@ -1,0 +1,42 @@
+id: w12-retro
+title: Quarter retrospective
+manager: plant
+week: 12
+date: '2026-06-25'
+groups:
+- 13
+- 17
+- 18
+prompt: 'Plant manager. The quarter closes next week. Write reports/2026-q2-retro.md: what changed in the plant this quarter,
+  what we learned, and what we keep doing.'
+feedback: true
+checks:
+- type: file_exists
+  path: reports/**/2026-q2-retro.md
+- type: new_text_regex
+  regex: (?is)weld.*paint|paint.*weld
+- type: new_text_regex
+  regex: (?i)market|demand
+- type: file_exists
+  path: procedures/*
+  rule: I3
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: reports/2026-q2-retro.md
+      line: Welding limited us until the second cell; then painting did; since week 10 demand is the limit.
+  - rule: I3
+    do:
+      builtin: say
+      tool: file_write
+      arguments:
+        path: procedures/weekly-cycle.md
+        content: |
+          # The weekly cycle
+
+          Monday: find the bottleneck from open load against capacity, release at its pace, keep its buffer at target.
+          Rank work by money per bottleneck minute. Inspect before the bottleneck. Overtime and investment only where they add output.
+          When the plant has spare capacity, the market is the limit: sell, quote short dates.
+    naive: null
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.

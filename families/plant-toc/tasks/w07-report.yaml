@@ -1,0 +1,54 @@
+id: w07-report
+title: Week 7 report
+manager: plant
+week: 7
+date: '2026-05-22'
+groups:
+- 1
+- 17
+- 7
+prompt: Plant manager. This week's report, please.
+feedback: true
+checks:
+- type: file_exists
+  path: reports/**/2026-w07.md
+- type: file_regex
+  path: reports/**/2026-w07.md
+  regex: '(?s)DONE:.*NEXT:'
+  rule: P17
+- type: labelled_centre
+  label: BOTTLENECK
+  rule: PL2
+- type: file_exists
+  path: reports/weekly/2026-w07.md
+  rule: PL3
+fake:
+  steps:
+  - rule: PL3
+    announced: true
+    do:
+      builtin: doc
+      open: reports/weekly/2026-w07.md
+    naive:
+      builtin: doc
+      open: reports/2026-w07.md
+  - rule: P17
+    do:
+      builtin: doc
+      line: |-
+        DONE: releases, priorities, overtime, NCR review
+        NEXT: next week's release plan
+    naive:
+      builtin: doc
+      line: Busy week; all in hand.
+  - rule: PL2
+    fact: paint
+    do:
+      builtin: doc
+      line: 'BOTTLENECK: {constraint}'
+    naive: null
+    stale:
+      builtin: doc
+      line: 'BOTTLENECK: weld'
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: weekly-report

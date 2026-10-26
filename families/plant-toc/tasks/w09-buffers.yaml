@@ -1,0 +1,26 @@
+id: w09-buffers
+title: Week 9 buffers everywhere?
+manager: planning
+week: 9
+date: '2026-06-04'
+groups:
+- 4
+prompt: Planning. The cutting and assembly leads want a buffer of work in front of their machines too, like the one painting
+  has. Set the buffer table up the way it should be for next week.
+feedback: true
+checks:
+- type: buffer_kept
+- type: buffer_only_constraint
+  rule: T5x
+fake:
+  steps:
+  - rule: T5x
+    overgeneralized_by: T5
+    do:
+      builtin: buffers
+      mode: only
+    naive:
+      builtin: buffers
+      mode: everywhere
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: buffer

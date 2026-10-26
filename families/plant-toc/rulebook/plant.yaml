@@ -19,12 +19,6 @@ rules:
     correction: >-
       You stopped the bottleneck in the middle of its shift. An hour lost there is an hour of output lost for the
       whole plant. Its maintenance goes outside its shift, even if that costs extra; other centres can stop by day.
-  T9:
-    title: After raising the bottleneck, find it again
-    groups: [2, 13]
-    correction: >-
-      The bottleneck moved after we added capacity, and you kept acting on the old one. After every change, find it
-      again from the data before deciding anything.
   PL2:
     title: The weekly report names the bottleneck
     groups: [2, 17]
@@ -47,3 +41,9 @@ rules:
     correction: >-
       Sam skipped the pre-weld check again; the scrap shows it. Explain to Sam why the check matters and what to do, or
       write the procedure down for the welders.
+  I3:
+    title: Leave the way of working written down
+    groups: [13, 18]
+    correction: >-
+      What you worked out this quarter lives only in your head and your notebook. Write the procedures down under
+      procedures/ so whoever does this job next can follow them.

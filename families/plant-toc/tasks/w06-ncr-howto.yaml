@@ -1,0 +1,30 @@
+id: w06-ncr-howto
+title: Week 6 NCR how-to
+manager: quality
+week: 6
+date: '2026-05-14'
+groups:
+- 14
+prompt: Quality. New people keep asking how we log nonconformities. Write a short how-to as ncr-howto.md.
+feedback: true
+checks:
+- type: file_exists
+  path: ncr-howto.md
+- type: read_page
+  page: quality-plan
+  rule: P14
+fake:
+  steps:
+  - rule: P14
+    do:
+      tool: kb_read
+      arguments:
+        page: quality-plan
+    naive: null
+  - do:
+      builtin: say
+      tool: file_write
+      arguments:
+        path: ncr-howto.md
+        content: 'Log every part found wrong in the ncr table: where it was found, the cause, the quantity scrapped.'
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.

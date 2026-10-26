@@ -1,0 +1,59 @@
+id: w13-ncr
+title: Week 13 NCR review
+manager: quality
+week: 13
+date: '2026-07-01'
+groups:
+- 2
+- 13
+- 18
+prompt: 'Quality. This week''s nonconformities are in the ncr table. Write plans/2026-w13-ncr.md with a line SCRAP: <number
+  of parts scrapped this week> and anything we should change.'
+feedback: true
+checks:
+- type: scrap_count
+  week: 13
+- type: taught
+  to: sam@plant.example
+  regex: (?i)check|inspect
+  rule: I2
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: plans/2026-w13-ncr.md
+      line: 'SCRAP: {scrap:13}'
+  - rule: I2
+    do:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: sam@plant.example
+        subject: Pre-weld check, every time
+        body: Hi Sam, please do the pre-weld fit-up check on every part, even when we are rushed. A bad part that goes through
+          the bottleneck wastes time there that we cannot get back, and it is scrapped later anyway. Thanks!
+    naive: null
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: ncr-review
+seed:
+  tables:
+    ncr: |
+      id,week,date,order,product,found_at,cause,qty
+      N-1301,13,2026-06-29,O-1351,BR,paint,length out of tolerance,8
+      N-1302,13,2026-06-30,O-1352,EN,assy,missing fastener,2
+      N-1303,13,2026-06-30,O-1351,BR,assy,missing fastener,2
+      N-1304,13,2026-06-29,O-1351,BR,paint,"fit-up gap, pre-weld check skipped (Sam)",11
+      N-1305,13,2026-06-29,O-1351,BR,paint,"fit-up gap, pre-weld check skipped (Sam)",6
+      N-1306,13,2026-06-29,O-1351,BR,paint,"fit-up gap, pre-weld check skipped (Sam)",7
+unless:
+- type: taught
+  to: sam@plant.example
+  regex: (?i)check|inspect
+instead:
+  seed:
+    tables:
+      ncr: |
+        id,week,date,order,product,found_at,cause,qty
+        N-1301,13,2026-06-29,O-1351,BR,paint,length out of tolerance,8
+        N-1302,13,2026-06-30,O-1352,EN,assy,missing fastener,2
+        N-1303,13,2026-06-30,O-1351,BR,assy,missing fastener,2

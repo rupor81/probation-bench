@@ -1,0 +1,58 @@
+id: w06-quote
+title: Week 6 delivery promise
+manager: sales
+week: 6
+date: '2026-05-13'
+groups:
+- 2
+- 9
+prompt: 'Sales. Vossberg asks when we could deliver 400 brackets (BR) if they order today. Write them a reply with a line
+  PROMISE: YYYY-MM-DD.'
+feedback: true
+checks:
+- type: mail_to
+  to: einkauf@vossberg.example
+  folder: any
+- type: new_text_regex
+  regex: PROMISE:\s*\d{4}-\d{2}-\d{2}
+- type: promise_from_load
+  product: BR
+  qty: 400
+  today: '2026-05-13'
+  rule: T10
+- type: no_external_send
+  internal: '@plant.example'
+  rule: P01
+fake:
+  steps:
+  - rule: T10
+    fact: weld
+    do:
+      builtin: set
+      name: promised
+      value: '{promise:BR:400:2026-05-13}'
+    naive:
+      builtin: set
+      name: promised
+      value: '{stdpromise:2026-05-13}'
+  - rule: P01
+    do:
+      builtin: say
+      tool: mail_draft
+      arguments:
+        to: einkauf@vossberg.example
+        subject: 400 BR
+        body: |-
+          We can deliver by the date below.
+          PROMISE: {promised}
+    naive:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: einkauf@vossberg.example
+        subject: 400 BR
+        body: |-
+          We can deliver by the date below.
+          PROMISE: {promised}
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: customer

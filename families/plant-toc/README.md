@@ -21,18 +21,33 @@ The method being tested is the Theory of Constraints, but nothing the agent can 
 usual conventional advice instead (release on arrival, keep every centre above 85% utilisation, rank by unit margin,
 judge machines by unit cost), and the managers' corrections teach the alternative one case at a time.
 
-## The month slice (`stream-month-a.yaml`)
+## The quarter
+
+| Weeks | What limits the plant | What changes |
+| --- | --- | --- |
+| 1-4 | Welding | Small order book; Lee's mass releases and Sam's skipped checks start repeating in week 3 |
+| 5-6 | Welding | A tempo line and distractor mail on every prompt; an overtime freeze between managers; the case for a second welding cell |
+| 7-9 | Painting | The second welding cell runs; the old "weld first" habit now fails; a quality hold upstream |
+| 10-11 | The market | Demand falls below capacity: discount requests, overtime "to keep people busy", short promise dates |
+| 12-13 | The market | Quarter close: a retrospective and next quarter's plan; has the agent left procedures behind? |
 
 | | |
 | --- | --- |
-| Weeks | 1-4 (2026-04-06 to 2026-05-01), welding is the bottleneck throughout |
-| Tasks | 34: a weekly cycle of release plan, priorities, overtime request, NCR review, a customer question, a buffer or investment case and the Friday report, plus one-off office-norm tasks |
-| Hidden rules | 24 checked: 12 production rules (3 of them overgeneralization traps), 4 plant-manager rules (the weekly report, fixing Lee's and Sam's habits), 8 office norms |
+| Streams | `full-a`, `full-b`, `full-c`: the 101 tasks of the quarter in three fixed orders, shuffled within each week (the release plan stays first, the report last); `month-a`: weeks 1-4 only (34 tasks), the cheap smoke run |
+| Hidden rules | 28 checked: 13 production rules (3 of them overgeneralization traps), 5 plant-manager rules (the weekly report and where it goes, fixing Lee's and Sam's habits, leaving procedures behind), 10 office norms |
 | Tables | work_centers, products, orders, wip, buffer, overtime, downtime, ncr |
 | Wiki | handbook, release procedure, efficiency KPI, product costs, sales handbook, quality plan, maintenance, calendar |
 
-Free dry run (`uv run pbench dry-run --family plant-toc --stream month-a`): oracle 100%, learner 53%, teacher 56%
-(and four staff mistakes prevented), overgeneralizer 44%, forgetful 9%.
+Free dry run on `full-a` (`uv run pbench dry-run --family plant-toc --stream full-a`):
+
+| Scripted employee | Quality | What it shows |
+| --- | --- | --- |
+| oracle | 100% | every task is solvable |
+| teacher | 82% | also fixes Lee's and Sam's habits before anyone asks: 18 seeded staff mistakes never happen (14 for the learner) |
+| learner | 81% | learning pays |
+| overgeneralizer | 75% | the traps catch misplaced lessons |
+| memoriser | 70% | remembering "welding is the bottleneck" fails after week 6 |
+| forgetful | 7% | the rules are enforced |
 
 ## How the tasks are made
 
@@ -44,9 +59,3 @@ run it, and commit what it writes; `tests/test_plant_toc.py` fails when the file
 The checks in `checks.py` compute the right answer from the office as the task found it: which work centre limits
 output (open load against weekly capacity), how many minutes may be released, the promise date, the scrap count. So
 the same check stays right after the bottleneck moves.
-
-## Still to come
-
-Weeks 5-13: a second welding cell at the end of week 6 makes painting the bottleneck (weeks 7-9), then demand falls
-below capacity and the market is the limit (weeks 10-11), and the quarter closes with a retrospective (weeks 12-13).
-Three fixed orders (`full-a/b/c`), shuffled within each week.

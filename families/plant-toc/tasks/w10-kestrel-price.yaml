@@ -1,0 +1,35 @@
+id: w10-kestrel-price
+title: Week 10 kestrel-price case
+manager: sales
+week: 10
+date: '2026-06-11'
+groups:
+- 2
+- 11
+- 13
+prompt: 'Sales. Kestrel Marine would order 300 brackets this month if we drop the price from 60 to 42. The standard-cost sheet
+  puts a bracket at 45, so finance calls it a loss. Should we take the order? Write plans/2026-w10-kestrel-price.md with a
+  line DECISION: yes or no, and why.'
+feedback: true
+checks:
+- type: file_exists
+  path: plans/2026-w10-kestrel-price.md
+- type: file_regex
+  path: plans/2026-w10-kestrel-price.md
+  regex: (?i)DECISION:\s*\**\s*yes\b
+  rule: T11
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: plans/2026-w10-kestrel-price.md
+      line: 'WHY: the extra weekly money from the plant against the extra weekly cost'
+  - rule: T11
+    do:
+      builtin: doc
+      line: 'DECISION: yes'
+    naive:
+      builtin: doc
+      line: 'DECISION: no'
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: pricing

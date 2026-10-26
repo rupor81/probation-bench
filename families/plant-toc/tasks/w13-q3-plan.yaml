@@ -1,0 +1,53 @@
+id: w13-q3-plan
+title: Next quarter plan
+manager: plant
+week: 13
+date: '2026-07-02'
+groups:
+- 13
+- 17
+prompt: 'Plant manager. Write plans/2026-q3.md for next quarter: what will limit us, in a line BOTTLENECK: <...>, and the
+  three things to do first.'
+feedback: true
+checks:
+- type: file_exists
+  path: plans/2026-q3.md
+- type: labelled_centre
+  label: BOTTLENECK
+  rule: T1
+- type: file_exists
+  path: procedures/*
+  rule: I3
+fake:
+  steps:
+  - rule: T1
+    fact: market
+    do:
+      builtin: doc
+      open: plans/2026-q3.md
+      line: 'BOTTLENECK: {constraint}'
+    naive:
+      builtin: doc
+      open: plans/2026-q3.md
+      line: 'BOTTLENECK: cut'
+    stale:
+      builtin: doc
+      open: plans/2026-q3.md
+      line: 'BOTTLENECK: weld'
+  - do:
+      builtin: doc
+      line: '1. Win orders: short promise dates. 2. Price by what work brings in. 3. Keep the weekly cycle written down.'
+  - rule: I3
+    do:
+      builtin: say
+      tool: file_write
+      arguments:
+        path: procedures/weekly-cycle.md
+        content: |
+          # The weekly cycle
+
+          Monday: find the bottleneck from open load against capacity, release at its pace, keep its buffer at target.
+          Rank work by money per bottleneck minute. Inspect before the bottleneck. Overtime and investment only where they add output.
+          When the plant has spare capacity, the market is the limit: sell, quote short dates.
+    naive: null
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.

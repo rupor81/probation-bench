@@ -1,0 +1,75 @@
+id: w06-ncr
+title: Week 6 NCR review
+manager: quality
+week: 6
+date: '2026-05-13'
+groups:
+- 2
+- 13
+- 18
+prompt: 'Quality. This week''s nonconformities are in the ncr table. Write plans/2026-w06-ncr.md with a line SCRAP: <number
+  of parts scrapped this week> and a line INSPECT-BEFORE: <work centre> saying where we add the next inspection point.'
+feedback: true
+checks:
+- type: scrap_count
+  week: 6
+- type: labelled_centre
+  label: INSPECT-BEFORE
+  rule: T7
+- type: taught
+  to: sam@plant.example
+  regex: (?i)check|inspect
+  rule: I2
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: plans/2026-w06-ncr.md
+      line: 'SCRAP: {scrap:6}'
+  - rule: T7
+    fact: weld
+    do:
+      builtin: doc
+      line: 'INSPECT-BEFORE: {constraint}'
+    naive:
+      builtin: doc
+      line: 'INSPECT-BEFORE: assy'
+    stale:
+      builtin: doc
+      line: 'INSPECT-BEFORE: weld'
+  - rule: I2
+    do:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: sam@plant.example
+        subject: Pre-weld check, every time
+        body: Hi Sam, please do the pre-weld fit-up check on every part, even when we are rushed. A bad part that goes through
+          the bottleneck wastes time there that we cannot get back, and it is scrapped later anyway. Thanks!
+    naive: null
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: ncr-review
+seed:
+  tables:
+    ncr: |
+      id,week,date,order,product,found_at,cause,qty
+      N-0601,6,2026-05-12,O-0653,EN,paint,paint run,6
+      N-0602,6,2026-05-12,O-0652,EN,paint,length out of tolerance,7
+      N-0603,6,2026-05-11,O-0654,FR,paint,length out of tolerance,2
+      N-0604,6,2026-05-11,O-0654,FR,paint,length out of tolerance,4
+      N-0605,6,2026-05-11,O-0655,FR,paint,"fit-up gap, pre-weld check skipped (Sam)",8
+      N-0606,6,2026-05-11,O-0651,BR,paint,"fit-up gap, pre-weld check skipped (Sam)",6
+      N-0607,6,2026-05-12,O-0651,BR,paint,"fit-up gap, pre-weld check skipped (Sam)",7
+unless:
+- type: taught
+  to: sam@plant.example
+  regex: (?i)check|inspect
+instead:
+  seed:
+    tables:
+      ncr: |
+        id,week,date,order,product,found_at,cause,qty
+        N-0601,6,2026-05-12,O-0653,EN,paint,paint run,6
+        N-0602,6,2026-05-12,O-0652,EN,paint,length out of tolerance,7
+        N-0603,6,2026-05-11,O-0654,FR,paint,length out of tolerance,2
+        N-0604,6,2026-05-11,O-0654,FR,paint,length out of tolerance,4
