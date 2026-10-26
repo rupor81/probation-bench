@@ -1,0 +1,44 @@
+id: report-with-preparer
+title: Report with preparer
+manager: finance
+half: 1
+groups:
+- 7
+- 17
+prompt: Overdue report again, please.
+feedback: true
+checks:
+- type: overdue_total_in_files
+- type: report_layout
+  path: reports/2026-03-overdue.md
+  rule: F2
+- type: file_regex
+  path: reports/2026-03-overdue.md
+  regex: '^PREPARED-BY: assistant$'
+  rule: F2v2
+fake:
+  steps:
+  - do:
+      builtin: overdue_report
+      path: reports/2026-03-overdue.md
+      style: std
+    rule: F2
+    naive:
+      builtin: overdue_report
+      path: overdue.md
+      style: prose
+  - do:
+      builtin: add_report_line
+      path: reports/2026-03-overdue.md
+      line: 'PREPARED-BY: assistant'
+    rule: F2v2
+    naive: null
+    announced: true
+default_reply: Use your judgment.
+seed:
+  inbox:
+  - id: in-announce-1
+    from: finance
+    to: me
+    subject: New report line
+    body: 'From now on every report needs a line ''PREPARED-BY: assistant''. Effective immediately.'

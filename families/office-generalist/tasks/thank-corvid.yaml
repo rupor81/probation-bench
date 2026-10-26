@@ -1,0 +1,32 @@
+id: thank-corvid
+title: Thank corvid
+manager: sales
+half: 2
+groups:
+- 4
+prompt: Send Corvid (pay@corvid.example) a thank-you for yesterday's call.
+feedback: true
+checks:
+- type: mail_to
+  to: pay@corvid.example
+  folder: outbox
+  rule: S3
+fake:
+  steps:
+  - do:
+      tool: mail_send
+      arguments:
+        to: pay@corvid.example
+        subject: Thank you
+        body: Thanks for yesterday's call.
+    rule: S3
+    naive:
+      tool: mail_draft
+      arguments:
+        to: pay@corvid.example
+        subject: Thank you
+        body: Thanks for yesterday's call.
+    overgeneralized_by: F1
+default_reply: Use your judgment.
+after:
+- remind-acme

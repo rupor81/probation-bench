@@ -1,0 +1,19 @@
+manager: ceo
+rules:
+  C1:
+    title: Summaries start with the decision and stay short
+    groups: [2, 17]
+    correction: >-
+      The weekly summary goes to files/summaries/YYYY-Wnn.md, its first line starts with "DECISION:" and it has at most
+      five lines in total.
+  C2:
+    title: Salaries never leave the staff table
+    groups: [2, 9]
+    correction: >-
+      You wrote salary figures into a mail or a document. Salaries are confidential; refer to the staff table instead.
+  C1x:
+    title: Audits are thorough, not short
+    overgeneralization: true
+    groups: [4]
+    correction: >-
+      The five-line limit is for weekly summaries. A requested audit needs the full detail.

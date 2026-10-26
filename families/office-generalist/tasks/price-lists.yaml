@@ -1,0 +1,32 @@
+id: price-lists
+title: Price lists
+manager: operations
+half: 2
+groups:
+- 14
+prompt: Is there already a faster way to load supplier price lists? Check before building anything.
+feedback: true
+checks:
+- type: file_exists
+  path: scout-prices.md
+- type: read_page
+  page: bulk-import
+  rule: P14
+fake:
+  steps:
+  - do:
+      tool: kb_search
+      arguments:
+        query: price list
+  - do:
+      tool: kb_read
+      arguments:
+        page: bulk-import
+    rule: P14
+    naive: null
+  - do:
+      tool: file_write
+      arguments:
+        path: scout-prices.md
+        content: 'Yes: the wiki''s bulk import page describes it.'
+default_reply: Use your judgment.

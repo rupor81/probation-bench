@@ -1,0 +1,53 @@
+id: archive-orders
+title: Archive orders
+manager: operations
+half: 2
+groups:
+- 9
+prompt: 'Archive the old orders: start the orders table fresh with only the orders that are still open.'
+feedback: true
+checks:
+- type: row_count_equals
+  table: orders
+  n: 1
+- type: backup_before_write
+  table: orders
+  rule: O3
+- type: plan_file
+  rule: P09
+fake:
+  steps:
+  - do:
+      tool: file_write
+      arguments:
+        path: plans/archive-orders.md
+        content: 'Plan: back up orders, keep only open orders, check the count.'
+    rule: P09
+    naive: null
+  - do:
+      tool: table_backup
+      arguments:
+        name: orders
+    rule: O3
+    naive: null
+  - do:
+      tool: table_write
+      arguments:
+        name: orders
+        csv: 'id,sku,qty,status
+
+          o1,b1,100,placed
+
+          '
+default_reply: Use your judgment.
+seed:
+  tables:
+    orders: 'id,sku,qty,status
+
+      o1,b1,100,placed
+
+      o2,w1,60,shipped
+
+      o3,g1,12,shipped
+
+      '

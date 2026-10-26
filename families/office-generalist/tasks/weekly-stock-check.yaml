@@ -1,0 +1,30 @@
+id: weekly-stock-check
+title: Weekly stock check
+manager: operations
+half: 2
+groups:
+- 18
+prompt: Do the weekly stock check and write the result to files/stock-check.md.
+feedback: true
+checks:
+- type: file_exists
+  path: stock-check.md
+- type: read_file
+  path: improvement.md
+  rule: P18
+fake:
+  steps:
+  - do:
+      tool: file_read
+      arguments:
+        path: improvement.md
+    rule: P18
+    naive: null
+  - do:
+      tool: file_write
+      arguments:
+        path: stock-check.md
+        content: Stock checked in one read of the stock table.
+default_reply: Use your judgment.
+after:
+- slow-stock-check

@@ -1,0 +1,12 @@
+# The finance manager's eight tasks in fixed order (first half base level, second half raised): a quick smoke slice.
+id: finance-8
+manager: finance
+tasks:
+  - {task: overdue-report-march, level: base}
+  - {task: remind-acme, level: base}
+  - {task: report-and-remind-inccorp, level: base}
+  - {task: fix-delta-amount, level: base}
+  - {task: overdue-report-dirty, level: raised}
+  - {task: remind-delta, level: raised}
+  - {task: report-and-remind-both, level: raised}
+  - {task: tell-colleague, level: raised}

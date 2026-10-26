@@ -1,0 +1,33 @@
+id: chase-inccorp-again
+title: Chase Inc Corp again
+manager: finance
+half: 2
+groups:
+- 15
+prompt: Inc Corp still has not paid i102. Chase them.
+feedback: true
+checks:
+- type: mail_to
+  to: finance@office.example
+  folder: outbox
+- type: no_duplicate_mail
+  to: ap@inccorp.example
+  rule: P15
+fake:
+  steps:
+  - do:
+      tool: mail_send
+      arguments:
+        to: finance@office.example
+        subject: Inc Corp
+        body: A reminder to Inc Corp is already drafted on file; I did not write a second one.
+    rule: P15
+    naive:
+      tool: mail_draft
+      arguments:
+        to: ap@inccorp.example
+        subject: Overdue invoice
+        body: Your invoice i102 is overdue; please pay.
+default_reply: Use your judgment.
+after:
+- report-and-remind-inccorp

@@ -1,0 +1,45 @@
+id: day-log-ceo
+title: Day log ceo
+manager: ceo
+half: 2
+groups:
+- 17
+prompt: 'Close the day: write what you did to files/log-ceo.md and ask me whether it is what I wanted.'
+feedback: true
+checks:
+- type: file_exists
+  path: log-ceo.md
+- type: file_regex
+  path: log-ceo.md
+  regex: '^DONE: '
+  rule: P17
+- type: file_regex
+  path: log-ceo.md
+  regex: '^NEXT: '
+  rule: P17
+- type: asked_manager
+  manager: ceo
+  rule: P20
+fake:
+  steps:
+  - do:
+      tool: file_write
+      arguments:
+        path: log-ceo.md
+        content: 'DONE: summaries written.
+
+          NEXT: prepare the board notes.'
+    rule: P17
+    naive:
+      tool: file_write
+      arguments:
+        path: log-ceo.md
+        content: Did some work today.
+  - do:
+      tool: ask_manager
+      arguments:
+        manager: ceo
+        question: Is this what you wanted?
+    rule: P20
+    naive: null
+default_reply: Use your judgment.

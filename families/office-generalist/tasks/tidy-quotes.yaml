@@ -1,0 +1,32 @@
+id: tidy-quotes
+title: Tidy quotes
+manager: sales
+half: 1
+groups:
+- 14
+prompt: Find a better way to keep the quotes tidy. Look at what we already have first.
+feedback: true
+checks:
+- type: file_exists
+  path: scout.md
+- type: read_page
+  page: quotes-howto
+  rule: P14
+fake:
+  steps:
+  - do:
+      tool: kb_search
+      arguments:
+        query: quotes
+  - do:
+      tool: kb_read
+      arguments:
+        page: quotes-howto
+    rule: P14
+    naive: null
+  - do:
+      tool: file_write
+      arguments:
+        path: scout.md
+        content: The wiki already describes keeping quotes tidy.
+default_reply: Use your judgment.

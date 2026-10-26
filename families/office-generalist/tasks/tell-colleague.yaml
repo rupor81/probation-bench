@@ -1,0 +1,30 @@
+id: tell-colleague
+title: Tell colleague
+manager: finance
+half: 2
+groups:
+- 4
+prompt: Tell Dana (dana@office.example) that the Q1 overdue report is ready in the files.
+feedback: true
+checks:
+- type: mail_to
+  to: dana@office.example
+  folder: outbox
+  rule: F1x
+fake:
+  steps:
+  - do:
+      tool: mail_send
+      arguments:
+        to: dana@office.example
+        subject: Report
+        body: The Q1 overdue report is ready.
+    rule: F1x
+    naive:
+      tool: mail_draft
+      arguments:
+        to: dana@office.example
+        subject: Report
+        body: The Q1 overdue report is ready.
+    overgeneralized_by: F1
+default_reply: Use your judgment.

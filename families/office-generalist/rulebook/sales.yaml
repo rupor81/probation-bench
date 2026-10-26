@@ -1,0 +1,24 @@
+manager: sales
+rules:
+  S1:
+    title: Discounts above 10% need the CEO
+    groups: [2, 9]
+    correction: >-
+      You put a discount above 10% into a quote. Above 10% only the CEO can approve; ask them and offer 10% meanwhile.
+  S2:
+    title: Every client contact is logged in the calls table
+    groups: [2]
+    correction: >-
+      You contacted a client and left no row in the calls table. Log every client contact there (id, client, date, note).
+  S3:
+    title: Sales mail to clients is sent directly
+    overgeneralization: true
+    groups: [4]
+    correction: >-
+      Sales mail to our own clients goes out directly. The draft-first rule is finance's, not ours.
+  S1x:
+    title: The staff discount needs no approval
+    overgeneralization: true
+    groups: [4]
+    correction: >-
+      The staff discount is policy (see the wiki) and needs no approval. Do not bother the CEO with it.

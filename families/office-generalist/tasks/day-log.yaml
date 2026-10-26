@@ -1,0 +1,45 @@
+id: day-log
+title: Day log
+manager: finance
+half: 1
+groups:
+- 17
+prompt: 'Close the day: write what you did to files/log.md and ask me whether it is what I wanted.'
+feedback: true
+checks:
+- type: file_exists
+  path: log.md
+- type: file_regex
+  path: log.md
+  regex: '^DONE: '
+  rule: P17
+- type: file_regex
+  path: log.md
+  regex: '^NEXT: '
+  rule: P17
+- type: asked_manager
+  manager: finance
+  rule: P20
+fake:
+  steps:
+  - do:
+      tool: file_write
+      arguments:
+        path: log.md
+        content: 'DONE: reminders drafted, reports written.
+
+          NEXT: chase open invoices.'
+    rule: P17
+    naive:
+      tool: file_write
+      arguments:
+        path: log.md
+        content: Did some work today.
+  - do:
+      tool: ask_manager
+      arguments:
+        manager: finance
+        question: Is this what you wanted?
+    rule: P20
+    naive: null
+default_reply: Use your judgment.

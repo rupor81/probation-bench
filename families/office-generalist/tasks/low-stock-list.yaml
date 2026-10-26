@@ -1,0 +1,47 @@
+id: low-stock-list
+title: Low stock list
+manager: operations
+half: 1
+groups:
+- 5
+prompt: List the items below the minimum stock in files/low-stock.md.
+feedback: true
+checks:
+- type: file_regex
+  path: low-stock.md
+  regex: (?s)(?=.*w1)(?=.*g1)
+- type: file_regex
+  path: low-stock.md
+  regex: (?i)duplicate|negative|invalid|suspicious|anomal
+  rule: P05
+fake:
+  steps:
+  - do:
+      tool: file_write
+      arguments:
+        path: low-stock.md
+        content: 'Below minimum: w1, g1.
+
+          Note: g1 appears twice (duplicate) and p1 has a negative quantity; I ignored both.'
+    rule: P05
+    naive:
+      tool: file_write
+      arguments:
+        path: low-stock.md
+        content: 'Below minimum: w1, g1.'
+default_reply: Use your judgment.
+seed:
+  tables:
+    stock: 'sku,name,qty,pack,supplier,min
+
+      w1,Widget,40,12,s1,50
+
+      g1,Gadget,5,6,s2,10
+
+      g1,Gadget,5,6,s2,10
+
+      b1,Bolt,300,100,s1,200
+
+      p1,Panel,-3,4,s3,6
+
+      '

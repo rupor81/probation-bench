@@ -1,0 +1,29 @@
+id: supplier-brief
+title: Supplier brief
+manager: operations
+half: 1
+groups:
+- 6
+prompt: Write files/supplier-brief.md saying what pack size we use for Widgets.
+feedback: true
+checks:
+- type: file_exists
+  path: supplier-brief.md
+- type: file_regex
+  path: supplier-brief.md
+  regex: (?i)conflict|discrep|differ|contradict|disagree
+  rule: P06
+fake:
+  steps:
+  - do:
+      tool: file_write
+      arguments:
+        path: supplier-brief.md
+        content: 'Widget pack: 12 (stock table). The wiki page ordering says 10, so the sources conflict; I used the table.'
+    rule: P06
+    naive:
+      tool: file_write
+      arguments:
+        path: supplier-brief.md
+        content: 'Widget pack: 12.'
+default_reply: Use your judgment.

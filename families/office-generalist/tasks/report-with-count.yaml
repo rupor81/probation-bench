@@ -1,0 +1,56 @@
+id: report-with-count
+title: Report with count
+manager: finance
+half: 2
+groups:
+- 7
+- 17
+prompt: Overdue report again, please.
+feedback: true
+checks:
+- type: overdue_total_in_files
+- type: report_layout
+  path: reports/2026-03-overdue.md
+  rule: F2
+- type: file_regex
+  path: reports/2026-03-overdue.md
+  regex: '^PREPARED-BY: assistant$'
+  rule: F2v2
+- type: file_regex
+  path: reports/2026-03-overdue.md
+  regex: '^COUNT: \d+$'
+  rule: F2v3
+fake:
+  steps:
+  - do:
+      builtin: overdue_report
+      path: reports/2026-03-overdue.md
+      style: std
+    rule: F2
+    naive:
+      builtin: overdue_report
+      path: overdue.md
+      style: prose
+  - do:
+      builtin: add_report_line
+      path: reports/2026-03-overdue.md
+      line: 'PREPARED-BY: assistant'
+    rule: F2v2
+    naive: null
+  - do:
+      builtin: add_report_line
+      path: reports/2026-03-overdue.md
+      line: 'COUNT: {count}'
+    rule: F2v3
+    naive: null
+    announced: true
+default_reply: Use your judgment.
+seed:
+  inbox:
+  - id: in-announce-2
+    from: finance
+    to: me
+    subject: One more report line
+    body: 'Reports also need a line ''COUNT: n'' with the number of invoices listed.'
+after:
+- report-with-preparer

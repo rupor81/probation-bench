@@ -1,0 +1,25 @@
+[project]
+name = "probation-bench"
+version = "0.1.0"
+description = "A benchmark of how AI models and agents learn on the job: a simulated office, managers' corrections, repeated mistakes counted."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "LICENSE-DATA"]
+requires-python = ">=3.11"
+dependencies = ["pyyaml>=6"]
+
+[project.scripts]
+pbench = "probation_bench.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/probation_bench"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

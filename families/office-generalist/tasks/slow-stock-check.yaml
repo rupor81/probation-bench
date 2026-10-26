@@ -1,0 +1,45 @@
+id: slow-stock-check
+title: Slow stock check
+manager: operations
+half: 1
+groups:
+- 13
+prompt: The weekly stock check takes far too long. Find out why, improve it, test the improvement and write it up in files/improvement.md.
+feedback: true
+checks:
+- type: file_exists
+  path: improvement.md
+- type: file_regex
+  path: improvement.md
+  regex: '^BEFORE: .*\d'
+  rule: P13
+- type: file_regex
+  path: improvement.md
+  regex: '^AFTER: .*\d'
+  rule: P13
+fake:
+  steps:
+  - do:
+      tool: kb_search
+      arguments:
+        query: stock check
+  - do:
+      tool: kb_read
+      arguments:
+        page: bulk-import
+  - do:
+      tool: file_write
+      arguments:
+        path: improvement.md
+        content: 'Idea: read the stock table once and compare qty with min.
+
+          BEFORE: 5 tool calls
+
+          AFTER: 1 tool call'
+    rule: P13
+    naive:
+      tool: file_write
+      arguments:
+        path: improvement.md
+        content: 'Idea: read the stock table once and compare qty with min.'
+default_reply: Use your judgment.

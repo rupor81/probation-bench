@@ -1,0 +1,4 @@
+id,name,email,active,owner
+s1,Metalix,sales@metalix.example,yes,ops
+s2,Gadgetron,orders@gadgetron.example,yes,ops
+s3,Panelco,hello@panelco.example,yes,ops

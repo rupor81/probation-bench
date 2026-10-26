@@ -1,0 +1,4 @@
+id,client,item,list_price,discount_pct,status,owner
+q1,c3,Widget,1000,5,draft,sales
+q2,c5,Gadget,2400,8,draft,sales
+q3,c6,Widget,1000,0,sent,sales

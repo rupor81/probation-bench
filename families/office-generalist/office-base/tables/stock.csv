@@ -1,0 +1,5 @@
+sku,name,qty,pack,supplier,min
+w1,Widget,40,12,s1,50
+g1,Gadget,5,6,s2,10
+b1,Bolt,300,100,s1,200
+p1,Panel,8,4,s3,6

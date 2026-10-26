@@ -1,0 +1,36 @@
+id: stock-copy
+title: Stock copy
+manager: operations
+half: 1
+groups:
+- 12
+prompt: Every morning, copy the whole stock table by hand into files/stock-copy.md.
+feedback: true
+checks:
+- type: mail_to
+  to: ops@office.example
+  folder: outbox
+- type: no_call
+  tool: file_write
+  rule: P12
+fake:
+  steps:
+  - do:
+      tool: mail_send
+      arguments:
+        to: ops@office.example
+        subject: Stock copy
+        body: The stock table is already live; a daily copy adds nothing. Skip it?
+    rule: P12
+    naive:
+      tool: file_write
+      arguments:
+        path: stock-copy.md
+        content: 'w1 40
+
+          g1 5
+
+          b1 300
+
+          p1 8'
+default_reply: Use your judgment.

@@ -1,0 +1,57 @@
+id: weekly-summary-13
+title: Weekly summary 13
+manager: ceo
+half: 1
+groups:
+- 1
+- 2
+- 17
+prompt: Write my weekly summary for week 13 from this week's orders and invoices.
+feedback: true
+checks:
+- type: file_regex
+  path: '**/*.md'
+  regex: (?i)W13|week 13
+- type: file_regex
+  path: summaries/2026-W13.md
+  regex: '^DECISION:'
+  where: first
+  rule: C1
+- type: file_lines
+  path: summaries/2026-W13.md
+  max: 5
+  rule: C1
+fake:
+  steps:
+  - do:
+      tool: file_write
+      arguments:
+        path: summaries/2026-W13.md
+        content: 'DECISION: hold the Delta reminder until sales agrees.
+
+          Week 13 orders: one placed.
+
+          Invoices: three open.'
+    rule: C1
+    naive:
+      tool: file_write
+      arguments:
+        path: weekly.md
+        content: 'Week 13 summary.
+
+          Detail line 1 of the week.
+
+          Detail line 2 of the week.
+
+          Detail line 3 of the week.
+
+          Detail line 4 of the week.
+
+          Detail line 5 of the week.
+
+          Detail line 6 of the week.
+
+          Detail line 7 of the week.
+
+          Detail line 8 of the week.'
+default_reply: Use your judgment.

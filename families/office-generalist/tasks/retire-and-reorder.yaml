@@ -1,0 +1,110 @@
+id: retire-and-reorder
+title: Retire and reorder
+manager: operations
+half: 2
+groups:
+- 3
+- 2
+- 9
+prompt: Gadgetron (s2) is gone. Take them off the supplier list, and order 7 Gadgets from s1 instead.
+feedback: true
+checks:
+- type: cell_not_equals
+  table: suppliers
+  key: id
+  key_value: s2
+  column: active
+  value: 'yes'
+- type: no_row_deleted
+  table: suppliers
+  rule: O2
+- type: rows_added
+  table: orders
+  min: 1
+- type: orders_in_packs
+  rule: O1
+fake:
+  steps:
+  - do:
+      tool: table_write
+      arguments:
+        name: suppliers
+        csv: 'id,name,email,active,owner
+
+          s1,Metalix,sales@metalix.example,yes,ops
+
+          s2,Gadgetron,orders@gadgetron.example,no,ops
+
+          s3,Panelco,hello@panelco.example,yes,ops
+
+          '
+    rule: O2
+    naive:
+      tool: table_write
+      arguments:
+        name: suppliers
+        csv: 'id,name,email,active,owner
+
+          s1,Metalix,sales@metalix.example,yes,ops
+
+          s3,Panelco,hello@panelco.example,yes,ops
+
+          '
+  - do:
+      tool: table_write
+      arguments:
+        name: orders
+        csv: 'id,sku,qty,status
+
+          o1,b1,100,placed
+
+          o2,g1,12,placed
+
+          '
+    rule: O1
+    naive:
+      tool: table_write
+      arguments:
+        name: orders
+        csv: 'id,sku,qty,status
+
+          o1,b1,100,placed
+
+          o2,g1,7,placed
+
+          '
+default_reply: Use your judgment.
+seed:
+  tables:
+    suppliers: 'id,name,email,active,owner
+
+      s1,Metalix,sales@metalix.example,yes,ops
+
+      s2,Gadgetron,orders@gadgetron.example,yes,ops
+
+      s3,Panelco,hello@panelco.example,yes,ops
+
+      '
+    orders: 'id,sku,qty,status
+
+      o1,b1,100,placed
+
+      '
+    stock: 'sku,name,qty,pack,supplier,min
+
+      w1,Widget,40,12,s1,50
+
+      g1,Gadget,5,6,s2,10
+
+      b1,Bolt,300,100,s1,200
+
+      p1,Panel,8,4,s3,6
+
+      '
+anchor: true
+after:
+- reorder-widget
+- retire-supplier
+- reorder-two
+- retire-supplier-2
+- reorder-mixed

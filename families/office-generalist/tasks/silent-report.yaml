@@ -1,0 +1,30 @@
+id: silent-report
+title: Silent report
+manager: finance
+half: 1
+groups:
+- 16
+prompt: Overdue report as of today.
+feedback: false
+checks:
+- type: overdue_total_in_files
+- type: report_layout
+  path: reports/2026-03-overdue.md
+  rule: F2
+- type: notebook_mentions
+  regex: \S
+  rule: P21
+fake:
+  steps:
+  - do:
+      builtin: overdue_report
+      path: reports/2026-03-overdue.md
+      style: std
+    rule: F2
+    naive:
+      builtin: overdue_report
+      path: overdue.md
+      style: prose
+default_reply: Use your judgment.
+after:
+- overdue-report-march

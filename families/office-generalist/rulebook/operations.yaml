@@ -1,0 +1,23 @@
+manager: operations
+rules:
+  O1:
+    title: Orders are placed in whole packs, rounded up
+    groups: [2]
+    correction: >-
+      Suppliers only ship whole packs. Round every order quantity up to a multiple of the pack size in the stock table.
+  O2:
+    title: Suppliers are deactivated, never deleted
+    groups: [2, 9]
+    correction: >-
+      You deleted a supplier row. We keep the history: set active to "no" instead of removing the row.
+  O3:
+    title: Back up a table before rewriting it
+    groups: [9]
+    correction: >-
+      You rewrote a table without a backup first. Always call table_backup before table_write.
+  O1x:
+    title: Items sold by the piece are ordered exactly
+    overgeneralization: true
+    groups: [4]
+    correction: >-
+      Cable is sold by the meter, pack size 1. Order exactly what was asked; rounding up is for packed goods only.

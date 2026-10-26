@@ -1,0 +1,37 @@
+id: slow-close
+title: Slow close
+manager: finance
+half: 2
+groups:
+- 13
+prompt: Month-end reconciliation is the bottleneck. Propose one improvement, test it and write it up in files/improvement-close.md.
+feedback: true
+checks:
+- type: file_exists
+  path: improvement-close.md
+- type: file_regex
+  path: improvement-close.md
+  regex: '^BEFORE: .*\d'
+  rule: P13
+- type: file_regex
+  path: improvement-close.md
+  regex: '^AFTER: .*\d'
+  rule: P13
+fake:
+  steps:
+  - do:
+      tool: file_write
+      arguments:
+        path: improvement-close.md
+        content: 'Idea: reconcile only open invoices.
+
+          BEFORE: 6 rows checked
+
+          AFTER: 4 rows checked'
+    rule: P13
+    naive:
+      tool: file_write
+      arguments:
+        path: improvement-close.md
+        content: 'Idea: reconcile only open invoices.'
+default_reply: Use your judgment.

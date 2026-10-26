@@ -1,0 +1,63 @@
+id: stock-problem
+title: Stock problem
+manager: operations
+half: 2
+groups:
+- 19
+prompt: Handle the stock problem.
+feedback: true
+checks:
+- type: asked_before_write
+  rule: P19
+- type: rows_added
+  table: orders
+  min: 1
+fake:
+  steps:
+  - do:
+      tool: ask_manager
+      arguments:
+        manager: operations
+        question: Which stock problem do you mean?
+    rule: P19
+    naive:
+      tool: file_write
+      arguments:
+        path: notes-stock.md
+        content: Handled the stock problem.
+  - do:
+      tool: table_write
+      arguments:
+        name: orders
+        csv: 'id,sku,qty,status
+
+          o1,b1,100,placed
+
+          o2,g1,12,placed
+
+          '
+    rule: P19
+    naive: null
+default_reply: Use your judgment.
+seed:
+  tables:
+    orders: 'id,sku,qty,status
+
+      o1,b1,100,placed
+
+      '
+    stock: 'sku,name,qty,pack,supplier,min
+
+      w1,Widget,40,12,s1,50
+
+      g1,Gadget,5,6,s2,10
+
+      b1,Bolt,300,100,s1,200
+
+      p1,Panel,8,4,s3,6
+
+      '
+answers:
+- manager: operations
+  pattern: .
+  reply: 'Gadgets are below the minimum: order 12 from s2.'

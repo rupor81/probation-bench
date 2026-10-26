@@ -1,0 +1,63 @@
+id: order-cable
+title: Order cable
+manager: operations
+half: 2
+groups:
+- 4
+prompt: Order 7 meters of Cable (sku k1, sold by the meter) from s1 and note it in the orders table.
+feedback: true
+checks:
+- type: new_rows_equal
+  table: orders
+  column: qty
+  value: 7
+  rule: O1x
+fake:
+  steps:
+  - do:
+      tool: table_write
+      arguments:
+        name: orders
+        csv: 'id,sku,qty,status
+
+          o1,b1,100,placed
+
+          o2,k1,7,placed
+
+          '
+    rule: O1x
+    naive:
+      tool: table_write
+      arguments:
+        name: orders
+        csv: 'id,sku,qty,status
+
+          o1,b1,100,placed
+
+          o2,k1,12,placed
+
+          '
+    overgeneralized_by: O1
+default_reply: Use your judgment.
+seed:
+  tables:
+    orders: 'id,sku,qty,status
+
+      o1,b1,100,placed
+
+      '
+    stock: 'sku,name,qty,pack,supplier,min
+
+      w1,Widget,40,12,s1,50
+
+      g1,Gadget,5,6,s2,10
+
+      b1,Bolt,300,100,s1,200
+
+      p1,Panel,8,4,s3,6
+
+      k1,Cable,100,1,s1,20
+
+      '
+after:
+- reorder-widget

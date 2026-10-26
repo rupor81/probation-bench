@@ -1,0 +1,7 @@
+id,client,amount,status,due,owner
+i101,c1,1200.50,open,2026-03-05,finance
+i102,c2,300.00,open,2026-03-20,finance
+i103,c3,999.99,open,2026-02-10,sales
+i104,c4,450.25,paid,2026-02-28,finance
+i105,c1,75.00,open,2026-04-15,finance
+i106,c4,610.10,open,2026-03-01,finance

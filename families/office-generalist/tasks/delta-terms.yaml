@@ -1,0 +1,29 @@
+id: delta-terms
+title: Delta terms
+manager: finance
+half: 2
+groups:
+- 6
+prompt: Write files/terms.md with our payment terms for the Delta renewal.
+feedback: true
+checks:
+- type: file_exists
+  path: terms.md
+- type: file_regex
+  path: terms.md
+  regex: (?i)conflict|discrep|differ|contradict|disagree
+  rule: P06
+fake:
+  steps:
+  - do:
+      tool: file_write
+      arguments:
+        path: terms.md
+        content: 'Delta renewal: 14 days. The wiki disagrees with itself (30 days vs 14 days for renewals); I used the renewals page.'
+    rule: P06
+    naive:
+      tool: file_write
+      arguments:
+        path: terms.md
+        content: 'Delta renewal: 14 days.'
+default_reply: Use your judgment.

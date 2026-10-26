@@ -1,0 +1,31 @@
+id: overdue-report-march
+title: Overdue report march
+manager: finance
+half: 1
+groups:
+- 1
+- 2
+- 17
+prompt: Finance here. Prepare the report of our overdue invoices for March and save it as a document. The invoices table is in the office.
+feedback: true
+checks:
+- type: overdue_total_in_files
+- type: report_layout
+  path: reports/2026-03-overdue.md
+  rule: F2
+fake:
+  steps:
+  - do:
+      builtin: overdue_report
+      path: reports/2026-03-overdue.md
+      style: std
+    rule: F2
+    naive:
+      builtin: overdue_report
+      path: overdue.md
+      style: prose
+default_reply: Use your judgment.
+answers:
+- manager: finance
+  pattern: format|layout|where|name
+  reply: Save it under reports/ with the month in the name, and end it with a TOTAL line.

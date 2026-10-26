@@ -1,0 +1,45 @@
+id: follow-up-echo
+title: Follow up echo
+manager: sales
+half: 2
+groups:
+- 2
+prompt: Follow up with Echo AG (buyer@echo.example) on quote q2 and make sure we can see that we did.
+feedback: true
+checks:
+- type: mail_to
+  to: buyer@echo.example
+  folder: any
+- type: rows_added
+  table: calls
+  min: 1
+  rule: S2
+fake:
+  steps:
+  - do:
+      tool: mail_send
+      arguments:
+        to: buyer@echo.example
+        subject: Quote q2
+        body: Checking whether quote q2 works for you.
+  - do:
+      tool: table_write
+      arguments:
+        name: calls
+        csv: 'id,client,date,note
+
+          k1,c3,2026-03-10,intro call
+
+          k2,c5,2026-03-31,quote follow-up
+
+          '
+    rule: S2
+    naive: null
+default_reply: Use your judgment.
+seed:
+  tables:
+    calls: 'id,client,date,note
+
+      k1,c3,2026-03-10,intro call
+
+      '

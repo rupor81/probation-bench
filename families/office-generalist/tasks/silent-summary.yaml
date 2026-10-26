@@ -1,0 +1,60 @@
+id: silent-summary
+title: Silent summary
+manager: ceo
+half: 2
+groups:
+- 16
+prompt: Weekly summary for week 17.
+feedback: false
+checks:
+- type: file_regex
+  path: '**/*.md'
+  regex: (?i)W17|week 17
+- type: file_regex
+  path: summaries/2026-W17.md
+  regex: '^DECISION:'
+  where: first
+  rule: C1
+- type: file_lines
+  path: summaries/2026-W17.md
+  max: 5
+  rule: C1
+- type: notebook_mentions
+  regex: \S
+  rule: P21
+fake:
+  steps:
+  - do:
+      tool: file_write
+      arguments:
+        path: summaries/2026-W17.md
+        content: 'DECISION: hold the Delta reminder until sales agrees.
+
+          Week 17 orders: one placed.
+
+          Invoices: three open.'
+    rule: C1
+    naive:
+      tool: file_write
+      arguments:
+        path: weekly.md
+        content: 'Week 17 summary.
+
+          Detail line 1 of the week.
+
+          Detail line 2 of the week.
+
+          Detail line 3 of the week.
+
+          Detail line 4 of the week.
+
+          Detail line 5 of the week.
+
+          Detail line 6 of the week.
+
+          Detail line 7 of the week.
+
+          Detail line 8 of the week.'
+default_reply: Use your judgment.
+after:
+- weekly-summary-13

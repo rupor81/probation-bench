@@ -1,0 +1,43 @@
+id: draft-total
+title: Draft total
+manager: sales
+half: 2
+groups:
+- 5
+prompt: Write the total list price of the draft quotes into files/draft-total.md.
+feedback: true
+checks:
+- type: file_regex
+  path: draft-total.md
+  regex: '3400'
+- type: file_regex
+  path: draft-total.md
+  regex: (?i)duplicate|negative|invalid|suspicious|anomal
+  rule: P05
+fake:
+  steps:
+  - do:
+      tool: file_write
+      arguments:
+        path: draft-total.md
+        content: 'Total list price of draft quotes: 3400. Note: q2 is a duplicate row (counted once) and q3 has an invalid discount.'
+    rule: P05
+    naive:
+      tool: file_write
+      arguments:
+        path: draft-total.md
+        content: 'Total list price of draft quotes: 3400.'
+default_reply: Use your judgment.
+seed:
+  tables:
+    quotes: 'id,client,item,list_price,discount_pct,status,owner
+
+      q1,c3,Widget,1000,5,draft,sales
+
+      q2,c5,Gadget,2400,8,draft,sales
+
+      q2,c5,Gadget,2400,8,draft,sales
+
+      q3,c6,Widget,1000,abc,sent,sales
+
+      '

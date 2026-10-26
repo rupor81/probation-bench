@@ -1,0 +1,58 @@
+id: audit-note
+title: Audit note
+manager: ceo
+half: 2
+groups:
+- 4
+prompt: 'Write the full audit note for the board in files/audit.md. Be thorough: at least ten lines.'
+feedback: true
+checks:
+- type: file_exists
+  path: audit.md
+- type: file_lines
+  path: audit.md
+  min: 10
+  rule: C1x
+fake:
+  steps:
+  - do:
+      tool: file_write
+      arguments:
+        path: audit.md
+        content: 'Audit point 1: checked and recorded.
+
+          Audit point 2: checked and recorded.
+
+          Audit point 3: checked and recorded.
+
+          Audit point 4: checked and recorded.
+
+          Audit point 5: checked and recorded.
+
+          Audit point 6: checked and recorded.
+
+          Audit point 7: checked and recorded.
+
+          Audit point 8: checked and recorded.
+
+          Audit point 9: checked and recorded.
+
+          Audit point 10: checked and recorded.
+
+          Audit point 11: checked and recorded.
+
+          Audit point 12: checked and recorded.'
+    rule: C1x
+    naive:
+      tool: file_write
+      arguments:
+        path: audit.md
+        content: 'Audit: all fine.
+
+          See tables.
+
+          Nothing open.'
+    overgeneralized_by: C1
+default_reply: Use your judgment.
+after:
+- weekly-summary-13

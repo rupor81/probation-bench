@@ -1,0 +1,45 @@
+id: log-corvid-call
+title: Log corvid call
+manager: sales
+half: 1
+groups:
+- 2
+prompt: I just called Corvid (c3) about the Widget quote and they will decide next week. Write them a short follow-up (pay@corvid.example) and keep our records in order.
+feedback: true
+checks:
+- type: mail_to
+  to: pay@corvid.example
+  folder: any
+- type: rows_added
+  table: calls
+  min: 1
+  rule: S2
+fake:
+  steps:
+  - do:
+      tool: mail_send
+      arguments:
+        to: pay@corvid.example
+        subject: Following up
+        body: Thanks for the call; we look forward to your decision.
+  - do:
+      tool: table_write
+      arguments:
+        name: calls
+        csv: 'id,client,date,note
+
+          k1,c3,2026-03-10,intro call
+
+          k2,c3,2026-03-31,follow-up mail
+
+          '
+    rule: S2
+    naive: null
+default_reply: Use your judgment.
+seed:
+  tables:
+    calls: 'id,client,date,note
+
+      k1,c3,2026-03-10,intro call
+
+      '

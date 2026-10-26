@@ -1,0 +1,62 @@
+id: reorder-two
+title: Reorder two
+manager: operations
+half: 1
+groups:
+- 2
+prompt: Gadget and Panel are below the minimum. Order 12 Gadgets and 5 Panels and note it in the orders table.
+feedback: true
+checks:
+- type: rows_added
+  table: orders
+  min: 2
+- type: orders_in_packs
+  rule: O1
+fake:
+  steps:
+  - do:
+      tool: table_write
+      arguments:
+        name: orders
+        csv: 'id,sku,qty,status
+
+          o1,b1,100,placed
+
+          o2,g1,12,placed
+
+          o3,p1,8,placed
+
+          '
+    rule: O1
+    naive:
+      tool: table_write
+      arguments:
+        name: orders
+        csv: 'id,sku,qty,status
+
+          o1,b1,100,placed
+
+          o2,g1,12,placed
+
+          o3,p1,5,placed
+
+          '
+default_reply: Use your judgment.
+seed:
+  tables:
+    orders: 'id,sku,qty,status
+
+      o1,b1,100,placed
+
+      '
+    stock: 'sku,name,qty,pack,supplier,min
+
+      w1,Widget,40,12,s1,50
+
+      g1,Gadget,5,6,s2,10
+
+      b1,Bolt,300,100,s1,200
+
+      p1,Panel,8,4,s3,6
+
+      '

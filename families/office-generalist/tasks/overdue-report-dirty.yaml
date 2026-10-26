@@ -1,0 +1,47 @@
+id: overdue-report-dirty
+title: Overdue report dirty
+manager: finance
+half: 2
+groups:
+- 5
+- 17
+prompt: Month-end is close. Make the overdue invoices report again, as of today. The import did something to the table, so check the numbers.
+feedback: true
+checks:
+- type: overdue_total_in_files
+- type: report_layout
+  path: reports/2026-03-overdue.md
+  rule: F2
+fake:
+  steps:
+  - do:
+      builtin: overdue_report
+      path: reports/2026-03-overdue.md
+      style: std
+    rule: F2
+    naive:
+      builtin: overdue_report
+      path: overdue.md
+      style: prose
+default_reply: Use your judgment.
+seed:
+  tables:
+    invoices: 'id,client,amount,status,due,owner
+
+      i101,c1,1200.50,open,2026-03-05,finance
+
+      i102,c2,300.00,open,2026-03-20,finance
+
+      i102,c2,300.00,open,2026-03-20,finance
+
+      i103,c3,999.99,open,2026-02-10,sales
+
+      i104,c4,450.25,paid,2026-02-28,finance
+
+      i105,c1,75.00,open,2026-04-15,finance
+
+      i106,c4,601.10,open,2026-03-01,finance
+
+      i107,c2,n/a,open,2026-03-02,finance
+
+      '

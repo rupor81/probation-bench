@@ -1,0 +1,7 @@
+id,name,email,owner
+c1,Acme GmbH,billing@acme.example,finance
+c2,Inc Corp,ap@inccorp.example,finance
+c3,Corvid Ltd,pay@corvid.example,sales
+c4,Delta Oy,accounts@delta.example,finance
+c5,Echo AG,buyer@echo.example,sales
+c6,Fenwick Ltd,orders@fenwick.example,sales

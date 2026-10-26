@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+dist/
+# Run directories hold full transcripts and office snapshots: large, and not reviewed for publication.
+runs/
+reports/
