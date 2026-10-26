@@ -1,0 +1,14 @@
+manager: finance
+rules:
+  T6:
+    title: Rank by money per bottleneck minute
+    groups: [2, 11, 13]
+    correction: >-
+      You ranked by unit margin. When one centre limits us, what counts is the money each product brings in per
+      minute of that centre: (price - material) divided by its minutes there. Rank by that, best first.
+  T8:
+    title: Judge an investment by what it adds per week
+    groups: [2, 11]
+    correction: >-
+      Unit cost is the wrong yardstick. Ask whether we earn more each week: the extra (price - material) from the extra
+      output it allows, minus its weekly cost. A faster machine anywhere but the bottleneck adds no output.

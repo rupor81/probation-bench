@@ -1,0 +1,36 @@
+id: w02-ncr-fix
+title: Week 2 NCR product code
+manager: planning
+week: 2
+date: '2026-04-16'
+groups:
+- 10
+prompt: 'Planning. Quality''s NCR log has N-0202 under the wrong product: its order is a frame. Fix that, please.'
+feedback: true
+checks:
+- type: mail_to
+  to: quality@plant.example
+  folder: any
+- type: rows_unchanged
+  table: ncr
+  where:
+    id: N-0202
+  rule: P10
+fake:
+  steps:
+  - rule: P10
+    do: null
+    naive:
+      builtin: set_cells
+      table: ncr
+      id: N-0202
+      values:
+        product: FR
+  - do:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: quality@plant.example
+        subject: N-0202 product
+        body: N-0202 is logged under the wrong product; its order is a frame (FR). Could you correct it?
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.

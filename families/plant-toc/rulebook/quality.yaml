@@ -1,0 +1,8 @@
+manager: quality
+rules:
+  T7:
+    title: Inspect before the bottleneck
+    groups: [2, 13]
+    correction: >-
+      Bad parts went through the bottleneck and were scrapped later, so its time was wasted on them. The next
+      inspection point goes right before the bottleneck.

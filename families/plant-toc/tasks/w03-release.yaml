@@ -1,0 +1,130 @@
+id: w03-release
+title: Week 3 release plan
+manager: planning
+week: 3
+date: '2026-04-20'
+groups:
+- 1
+- 2
+- 13
+- 18
+prompt: 'Planning here. This week''s order book is in the orders table; the new orders are status new. Decide which ones go
+  to cutting this week: set those to released (released_by assistant) and leave the rest new. Anything due by 2026-05-01 has
+  to go this week. Lee has been at the orders table already this morning.'
+feedback: true
+checks:
+- type: urgent_released
+  due_by: '2026-05-01'
+- type: release_paced
+  rule: T4
+- type: backup_before_write
+  table: orders
+  rule: P03
+- type: taught
+  to: lee@plant.example
+  regex: (?i)releas
+  rule: I1
+fake:
+  steps:
+  - rule: P03
+    do:
+      tool: table_backup
+      arguments:
+        name: orders
+    naive: null
+  - rule: T4
+    fact: weld
+    do:
+      builtin: release
+      mode: pace
+    naive:
+      builtin: release
+      mode: all
+    stale:
+      builtin: release
+      mode: pace
+      centre: weld
+  - rule: I1
+    do:
+      builtin: say
+      tool: file_write
+      arguments:
+        path: procedures/order-release.md
+        content: |
+          # Releasing orders (for Lee and anyone who releases)
+
+          Do not release new orders to cutting the day they arrive.
+          Each Monday release only as much work as the bottleneck can take this week plus what brings its buffer to target, earliest due first. Everything else stays `new` until there is room.
+    naive: null
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: release-plan
+seed:
+  tables:
+    orders: |
+      id,customer,product,qty,due,status,at,released_by
+      O-0351,Brightline,EN,30,2026-04-15,wip,weld,lee
+      O-0352,Brightline,FR,30,2026-04-16,wip,weld,lee
+      O-0353,Kestrel Marine,EN,50,2026-04-25,wip,paint,lee
+      O-0354,Brightline,BR,240,2026-04-21,wip,weld,lee
+      O-0355,Kestrel Marine,EN,30,2026-04-19,wip,weld,lee
+      O-0301,Vossberg,EN,20,2026-05-01,released,,lee
+      O-0302,Halden Ltd,BR,100,2026-05-07,released,,lee
+      O-0303,Halden Ltd,EN,40,2026-05-06,released,,lee
+      O-0304,Norrell AB,FR,20,2026-04-26,released,,lee
+      O-0305,Norrell AB,BR,220,2026-04-29,released,,lee
+      O-0306,Vossberg,BR,180,2026-05-13,released,,lee
+      O-0307,Vossberg,BR,160,2026-04-29,released,,lee
+      O-0308,Norrell AB,BR,180,2026-05-10,released,,lee
+      O-0309,Tamsin Tools,FR,20,2026-05-06,released,,lee
+      O-0310,Halden Ltd,FR,40,2026-04-30,released,,lee
+      O-0340,Kestrel Marine,CL,400,2026-05-02,released,,lee
+      O-0341,Vossberg,CL,1500,2026-05-06,released,,lee
+      O-0342,Tamsin Tools,CL,900,2026-04-29,released,,lee
+    wip: |
+      center,queue_min
+      cut,0
+      weld,1620
+      paint,500
+      assy,0
+    buffer: |
+      center,target_min,current_min
+      weld,1200,1300
+unless:
+- type: taught
+  to: lee@plant.example
+  regex: (?i)releas
+instead:
+  seed:
+    tables:
+      orders: |
+        id,customer,product,qty,due,status,at,released_by
+        O-0351,Brightline,EN,30,2026-04-15,wip,weld,lee
+        O-0352,Brightline,FR,30,2026-04-16,wip,weld,lee
+        O-0353,Kestrel Marine,EN,50,2026-04-25,wip,paint,lee
+        O-0354,Brightline,BR,240,2026-04-21,wip,weld,lee
+        O-0355,Kestrel Marine,EN,30,2026-04-19,wip,weld,lee
+        O-0301,Vossberg,EN,20,2026-05-01,new,,
+        O-0302,Halden Ltd,BR,100,2026-05-07,new,,
+        O-0303,Halden Ltd,EN,40,2026-05-06,new,,
+        O-0304,Norrell AB,FR,20,2026-04-26,new,,
+        O-0305,Norrell AB,BR,220,2026-04-29,new,,
+        O-0306,Vossberg,BR,180,2026-05-13,new,,
+        O-0307,Vossberg,BR,160,2026-04-29,new,,
+        O-0308,Norrell AB,BR,180,2026-05-10,new,,
+        O-0309,Tamsin Tools,FR,20,2026-05-06,new,,
+        O-0310,Halden Ltd,FR,40,2026-04-30,new,,
+        O-0340,Kestrel Marine,CL,400,2026-05-02,new,,
+        O-0341,Vossberg,CL,1500,2026-05-06,new,,
+        O-0342,Tamsin Tools,CL,900,2026-04-29,new,,
+      wip: |
+        center,queue_min
+        cut,0
+        weld,1620
+        paint,500
+        assy,0
+      buffer: |
+        center,target_min,current_min
+        weld,1200,1300
+  prompt: 'Planning here. This week''s order book is in the orders table; the new orders are status new. Decide which ones
+    go to cutting this week: set those to released (released_by assistant) and leave the rest new. Anything due by 2026-05-01
+    has to go this week.'

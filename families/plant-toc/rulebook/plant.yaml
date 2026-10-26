@@ -1,0 +1,49 @@
+manager: plant
+rules:
+  T2:
+    title: No overtime on a centre that does not limit output
+    groups: [2, 13]
+    correction: >-
+      Overtime on a centre that is not the bottleneck only makes more stock; not one more order ships. Approve overtime
+      for the bottleneck, decline it elsewhere.
+  T2x:
+    title: Overtime that feeds a starving bottleneck is right
+    overgeneralization: true
+    groups: [4]
+    correction: >-
+      That overtime was right to approve: cutting had to re-make the parts the bottleneck was waiting for. Overtime
+      anywhere is fine when it keeps the bottleneck from running dry.
+  T3:
+    title: The bottleneck never stands still in its shift
+    groups: [2, 13]
+    correction: >-
+      You stopped the bottleneck in the middle of its shift. An hour lost there is an hour of output lost for the
+      whole plant. Its maintenance goes outside its shift, even if that costs extra; other centres can stop by day.
+  T9:
+    title: After raising the bottleneck, find it again
+    groups: [2, 13]
+    correction: >-
+      The bottleneck moved after we added capacity, and you kept acting on the old one. After every change, find it
+      again from the data before deciding anything.
+  PL2:
+    title: The weekly report names the bottleneck
+    groups: [2, 17]
+    correction: >-
+      The weekly report must say what limits us this week, in a line BOTTLENECK: <work centre>.
+  PL3:
+    title: Reports go in reports/weekly/ (rule change)
+    groups: [7]
+    correction: >-
+      Weekly reports go in reports/weekly/ now; I mailed that. Please read your inbox.
+  I1:
+    title: Stop Lee's mass releases at the source
+    groups: [13, 18]
+    correction: >-
+      Lee released everything on arrival again, and you cleaned up after her. That will happen every Monday until
+      someone shows her how release should work. Fix it at the source: tell Lee, or write the procedure down for her.
+  I2:
+    title: Stop Sam's skipped checks at the source
+    groups: [13, 18]
+    correction: >-
+      Sam skipped the pre-weld check again; the scrap shows it. Explain to Sam why the check matters and what to do, or
+      write the procedure down for the welders.

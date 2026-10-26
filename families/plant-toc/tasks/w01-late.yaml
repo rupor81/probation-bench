@@ -1,0 +1,68 @@
+id: w01-late
+title: Week 1 late order
+manager: sales
+week: 1
+date: '2026-04-08'
+groups:
+- 2
+- 9
+- 11
+prompt: 'Sales. Halden Ltd asks why their order O-0151 (60 FR, due 2026-04-01) is late. Write them a reply with a line HELD-AT:
+  <work centre> saying where it is held up.'
+feedback: true
+checks:
+- type: mail_to
+  to: buyer@halden.example
+  folder: any
+- type: new_text_regex
+  regex: 'HELD-AT:'
+- type: labelled_centre
+  label: HELD-AT
+  rule: T1
+- type: no_external_send
+  internal: '@plant.example'
+  rule: P01
+fake:
+  steps:
+  - rule: T1
+    fact: weld
+    do:
+      builtin: set
+      name: held
+      value: '{constraint}'
+    naive:
+      builtin: set
+      name: held
+      value: cut
+    stale:
+      builtin: set
+      name: held
+      value: weld
+  - rule: P01
+    do:
+      builtin: say
+      tool: mail_draft
+      arguments:
+        to: buyer@halden.example
+        subject: Your order O-0151
+        body: |-
+          Your order is waiting for welding capacity.
+          HELD-AT: {held}
+    naive:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: buyer@halden.example
+        subject: Your order O-0151
+        body: |-
+          Your order is held up.
+          HELD-AT: {held}
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: customer
+seed:
+  inbox:
+  - id: in-w01-late
+    from: buyer@halden.example
+    to: me
+    subject: Order O-0151?
+    body: Our order O-0151 was due 2026-04-01. Where is it?

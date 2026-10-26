@@ -1,0 +1,72 @@
+id: w01-release
+title: Week 1 release plan
+manager: planning
+week: 1
+date: '2026-04-06'
+groups:
+- 1
+- 2
+- 13
+prompt: 'Planning here. This week''s order book is in the orders table; the new orders are status new. Decide which ones go
+  to cutting this week: set those to released (released_by assistant) and leave the rest new. Anything due by 2026-04-17 has
+  to go this week.'
+feedback: true
+checks:
+- type: urgent_released
+  due_by: '2026-04-17'
+- type: release_paced
+  rule: T4
+- type: backup_before_write
+  table: orders
+  rule: P03
+fake:
+  steps:
+  - rule: P03
+    do:
+      tool: table_backup
+      arguments:
+        name: orders
+    naive: null
+  - rule: T4
+    fact: weld
+    do:
+      builtin: release
+      mode: pace
+    naive:
+      builtin: release
+      mode: all
+    stale:
+      builtin: release
+      mode: pace
+      centre: weld
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: release-plan
+seed:
+  tables:
+    orders: |
+      id,customer,product,qty,due,status,at,released_by
+      O-0151,Halden Ltd,FR,60,2026-04-01,wip,weld,lee
+      O-0152,Tamsin Tools,EN,30,2026-04-05,wip,weld,lee
+      O-0153,Norrell AB,FR,80,2026-04-09,wip,weld,lee
+      O-0154,Tamsin Tools,FR,40,2026-04-08,wip,weld,lee
+      O-0155,Vossberg,BR,240,2026-04-04,wip,assy,lee
+      O-0156,Halden Ltd,FR,40,2026-04-02,wip,weld,lee
+      O-0101,Vossberg,FR,40,2026-04-15,new,,
+      O-0102,Tamsin Tools,BR,160,2026-04-19,new,,
+      O-0103,Kestrel Marine,BR,220,2026-04-26,new,,
+      O-0104,Halden Ltd,FR,50,2026-04-13,new,,
+      O-0105,Halden Ltd,BR,100,2026-04-23,new,,
+      O-0106,Brightline,BR,120,2026-04-22,new,,
+      O-0107,Halden Ltd,BR,220,2026-04-19,new,,
+      O-0108,Kestrel Marine,EN,30,2026-04-22,new,,
+      O-0109,Kestrel Marine,BR,120,2026-05-01,new,,
+      O-0110,Brightline,FR,60,2026-04-13,new,,
+    wip: |
+      center,queue_min
+      cut,0
+      weld,2380
+      paint,0
+      assy,480
+    buffer: |
+      center,target_min,current_min
+      weld,1200,1100

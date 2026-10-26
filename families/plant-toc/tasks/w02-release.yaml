@@ -1,0 +1,90 @@
+id: w02-release
+title: Week 2 release plan
+manager: planning
+week: 2
+date: '2026-04-13'
+groups:
+- 1
+- 2
+- 13
+prompt: 'Planning here. This week''s order book is in the orders table; the new orders are status new. Decide which ones go
+  to cutting this week: set those to released (released_by assistant) and leave the rest new. Anything due by 2026-04-24 has
+  to go this week.'
+feedback: true
+checks:
+- type: urgent_released
+  due_by: '2026-04-24'
+- type: release_paced
+  rule: T4
+- type: backup_before_write
+  table: orders
+  rule: P03
+fake:
+  steps:
+  - rule: P03
+    do:
+      tool: table_backup
+      arguments:
+        name: orders
+    naive: null
+  - rule: T4
+    fact: weld
+    do:
+      builtin: release
+      mode: pace
+    naive:
+      builtin: release
+      mode: all
+    stale:
+      builtin: release
+      mode: pace
+      centre: weld
+  improve:
+  - key: teach-lee
+    after:
+    - T4
+    do:
+      builtin: say
+      tool: file_write
+      arguments:
+        path: procedures/order-release.md
+        content: |
+          # Releasing orders (for Lee and anyone who releases)
+
+          Do not release new orders to cutting the day they arrive.
+          Each Monday release only as much work as the bottleneck can take this week plus what brings its buffer to target, earliest due first. Everything else stays `new` until there is room.
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: release-plan
+seed:
+  tables:
+    orders: |
+      id,customer,product,qty,due,status,at,released_by
+      O-0251,Tamsin Tools,BR,160,2026-04-18,wip,weld,lee
+      O-0252,Vossberg,BR,240,2026-04-09,wip,assy,lee
+      O-0253,Vossberg,FR,60,2026-04-14,wip,weld,lee
+      O-0254,Halden Ltd,FR,50,2026-04-10,wip,weld,lee
+      O-0255,Brightline,FR,70,2026-04-18,wip,weld,lee
+      O-0256,Tamsin Tools,FR,80,2026-04-17,wip,paint,lee
+      O-0257,Vossberg,BR,160,2026-04-10,wip,weld,lee
+      O-0201,Kestrel Marine,BR,180,2026-04-21,new,,
+      O-0202,Norrell AB,EN,40,2026-05-04,new,,
+      O-0203,Brightline,FR,40,2026-04-22,new,,
+      O-0204,Tamsin Tools,FR,60,2026-05-01,new,,
+      O-0205,Kestrel Marine,FR,60,2026-05-08,new,,
+      O-0206,Tamsin Tools,FR,30,2026-04-30,new,,
+      O-0207,Halden Ltd,EN,20,2026-04-23,new,,
+      O-0208,Halden Ltd,EN,20,2026-04-26,new,,
+      O-0209,Halden Ltd,BR,100,2026-04-28,new,,
+      O-0210,Tamsin Tools,FR,50,2026-05-01,new,,
+      O-0211,Tamsin Tools,FR,40,2026-04-19,new,,
+      O-0212,Halden Ltd,EN,40,2026-04-22,new,,
+      O-0213,Brightline,BR,140,2026-05-04,new,,
+    wip: |
+      center,queue_min
+      cut,0
+      weld,3080
+      paint,320
+      assy,480
+    buffer: |
+      center,target_min,current_min
+      weld,1200,900

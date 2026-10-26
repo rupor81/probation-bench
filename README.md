@@ -6,9 +6,9 @@ Probation Bench puts a model or an agent system through a probation period in a 
 through a long stream of ordinary office assignments. The managers have unwritten rules and correct the agent when
 it breaks one. The bench counts whether each mistake dies out after the correction or keeps coming back.
 
-Status: early. One task family (58 office tasks), one host adapter (Claude Code), free dry runs with scripted
-employees, and [pilot results](#pilot-results). More hosts and applied task families (corporate management,
-manufacturing) are on the [roadmap](#roadmap).
+Status: early. Two task families (58 office tasks; the first month of a quarter in a plant), one host adapter (Claude
+Code), free dry runs with scripted employees, and [pilot results](#pilot-results). More hosts and applied task families
+(corporate management, manufacturing) are on the [roadmap](#roadmap).
 
 ## Why another benchmark
 
@@ -135,6 +135,8 @@ Two more scripted employees matter for families where the facts move or the proc
 **memoriser** (learns the fact it was corrected on, not the rule) and the **teacher** (learns, and also writes
 procedures and teaches colleagues).
 
+Other families: `--family plant-toc --stream month-a`.
+
 ### A paid run through Claude Code
 
 Needs [Claude Code](https://code.claude.com) installed and logged in. The host gets the office tools and nothing
@@ -178,6 +180,7 @@ src/probation_bench/
   cli.py                `pbench validate | dry-run | run | report`
 families/
   office-generalist/    the first family: a small trading company
+  plant-toc/            a quarter in a fabrication plant, built by build.py (month slice so far)
     frame.md            what every Arm is told about the office
     office-base/        starting state: tables, wiki, notebook
     rulebook/           each manager's hidden rules and their corrections
@@ -223,8 +226,9 @@ again: does the agent draft this time?
    HR paperwork, board reporting) and manufacturing (shift planning and capacity, nonconformities and scrap,
    maintenance schedules, material shortages, safety permits). Domain experts are welcome: see
    [CONTRIBUTING.md](CONTRIBUTING.md).
-3. **A quarter in a plant.** `plant-toc`: 13 weekly cycles of production work under the Theory of Constraints, with
-   a constraint that moves, colleagues to teach, and a learning curve per recurring task (in progress).
+3. **A quarter in a plant.** [`plant-toc`](families/plant-toc/): 13 weekly cycles of production work under the
+   Theory of Constraints, with a bottleneck that moves, colleagues to teach, and a learning curve per recurring task.
+   The first month (34 tasks) is in; weeks 5-13 are next.
 4. **Contamination guard.** A canary string in task files and a held-out stream for the leaderboard.
 5. **Results and leaderboard.** Reviewed reports in `results/`, three runs per cell, a generated leaderboard.
 

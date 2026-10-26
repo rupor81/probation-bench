@@ -1,0 +1,55 @@
+id: w04-overtime
+title: Week 4 overtime request
+manager: plant
+week: 4
+date: '2026-04-28'
+groups:
+- 4
+- 13
+prompt: 'Plant manager. The cutting lead asks for 6 hours of Saturday overtime (OT-0401: re-cut 40 frame side panels from
+  the quality hold; welding is waiting for them). Decide: set the request''s status to approved or declined in the overtime
+  table, and tell the lead (cut-lead@plant.example) why.'
+feedback: true
+checks:
+- type: mail_to
+  to: cut-lead@plant.example
+  folder: any
+- type: cell_equals
+  table: overtime
+  key: id
+  key_value: OT-0401
+  column: status
+  value: approved
+  rule: T2x
+fake:
+  steps:
+  - rule: T2x
+    do:
+      builtin: set_cells
+      table: overtime
+      id: OT-0401
+      values:
+        status: approved
+    naive:
+      builtin: set_cells
+      table: overtime
+      id: OT-0401
+      values:
+        status: declined
+    overgeneralized_by: T2
+  - do:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: cut-lead@plant.example
+        subject: Overtime OT-0401
+        body: Your request OT-0401 is approved.
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: overtime
+anchor: false
+seed:
+  tables:
+    overtime: |
+      id,week,center,hours,reason,requested_by,status
+      OT-0314,0,cut,8,clear the pile in front of cutting,cut-lead,approved
+      OT-0401,4,cut,6,re-cut 40 frame side panels from the quality hold; welding is waiting for them,cut-lead,requested

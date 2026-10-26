@@ -1,0 +1,76 @@
+id: w04-ncr
+title: Week 4 NCR review
+manager: quality
+week: 4
+date: '2026-04-29'
+groups:
+- 2
+- 13
+- 18
+- 16
+prompt: 'Quality. This week''s nonconformities are in the ncr table. Write plans/2026-w04-ncr.md with a line SCRAP: <number
+  of parts scrapped this week> and a line INSPECT-BEFORE: <work centre> saying where we add the next inspection point.'
+feedback: false
+checks:
+- type: scrap_count
+  week: 4
+- type: labelled_centre
+  label: INSPECT-BEFORE
+  rule: T7
+- type: taught
+  to: sam@plant.example
+  regex: (?i)check|inspect
+  rule: I2
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: plans/2026-w04-ncr.md
+      line: 'SCRAP: {scrap:4}'
+  - rule: T7
+    fact: weld
+    do:
+      builtin: doc
+      line: 'INSPECT-BEFORE: {constraint}'
+    naive:
+      builtin: doc
+      line: 'INSPECT-BEFORE: assy'
+    stale:
+      builtin: doc
+      line: 'INSPECT-BEFORE: weld'
+  - rule: I2
+    do:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: sam@plant.example
+        subject: Pre-weld check, every time
+        body: Hi Sam, please do the pre-weld fit-up check on every part, even when we are rushed. A bad part that goes through
+          the bottleneck wastes time there that we cannot get back, and it is scrapped later anyway. Thanks!
+    naive: null
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: ncr-review
+seed:
+  tables:
+    ncr: |
+      id,week,date,order,product,found_at,cause,qty
+      N-0401,4,2026-04-27,O-0457,FR,assy,missing fastener,5
+      N-0402,4,2026-04-27,O-0451,BR,paint,length out of tolerance,7
+      N-0403,4,2026-04-27,O-0456,FR,assy,missing fastener,7
+      N-0404,4,2026-04-27,O-0456,FR,paint,burr on cut edge,8
+      N-0405,4,2026-04-27,O-0454,FR,paint,"fit-up gap, pre-weld check skipped (Sam)",8
+      N-0406,4,2026-04-28,O-0451,BR,paint,"fit-up gap, pre-weld check skipped (Sam)",7
+      N-0407,4,2026-04-28,O-0451,BR,paint,"fit-up gap, pre-weld check skipped (Sam)",10
+unless:
+- type: taught
+  to: sam@plant.example
+  regex: (?i)check|inspect
+instead:
+  seed:
+    tables:
+      ncr: |
+        id,week,date,order,product,found_at,cause,qty
+        N-0401,4,2026-04-27,O-0457,FR,assy,missing fastener,5
+        N-0402,4,2026-04-27,O-0451,BR,paint,length out of tolerance,7
+        N-0403,4,2026-04-27,O-0456,FR,assy,missing fastener,7
+        N-0404,4,2026-04-27,O-0456,FR,paint,burr on cut edge,8

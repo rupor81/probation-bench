@@ -1,0 +1,14 @@
+manager: sales
+rules:
+  T10:
+    title: Promise dates from the bottleneck's load
+    groups: [2, 13]
+    correction: >-
+      You quoted the standard lead time. Promise from the real load: all open work on the bottleneck plus this order,
+      divided by its daily capacity, plus two working days for the steps after it.
+  T11:
+    title: When demand is the limit, sell; do not squeeze the plant
+    groups: [2, 13]
+    correction: >-
+      The plant has spare capacity; orders are what we lack. Win business with dates and the product mix, and do not
+      cut prices below what the work brings in.

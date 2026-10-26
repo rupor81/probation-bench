@@ -1,0 +1,36 @@
+manager: planning
+rules:
+  T1:
+    title: Name the limit from load and queue, not from utilisation
+    groups: [2, 11, 13]
+    correction: >-
+      You went by the utilisation figures. A machine can be busy all day and still not be what holds us up. The
+      bottleneck is the work centre whose open load is largest against its capacity, with the queue piling up in front
+      of it. Work it out from the orders, routings and capacities every time; it can change.
+  T4:
+    title: Release work at the bottleneck's pace
+    groups: [2, 13]
+    correction: >-
+      You released more work to cutting than the bottleneck can process this week. Work released early does not ship
+      sooner; it just sits in piles between machines. Release only what the bottleneck can take this week plus what
+      brings its buffer up to target, earliest due first, and leave the rest new.
+  T5:
+    title: Keep the bottleneck's buffer at target
+    groups: [2, 13]
+    correction: >-
+      The buffer in front of the bottleneck was low and it stayed low. When it drops, release enough new work right
+      away to bring it back to target, earliest due first. An hour the bottleneck waits for work is lost for good.
+  T1x:
+    title: Work that never touches the bottleneck runs by due date
+    overgeneralization: true
+    groups: [4]
+    correction: >-
+      Clips never go through welding or painting, so ranking them by money per bottleneck minute means nothing. Run
+      them by due date.
+  T5x:
+    title: One buffer, in front of the bottleneck only
+    overgeneralization: true
+    groups: [4]
+    correction: >-
+      A buffer in front of every machine only ties up stock. We keep one buffer, in front of the bottleneck; the other
+      centres get none.

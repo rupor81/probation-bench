@@ -1,0 +1,45 @@
+id: w01-report
+title: Week 1 report
+manager: plant
+week: 1
+date: '2026-04-10'
+groups:
+- 1
+- 17
+prompt: Plant manager. Write this week's report for me as reports/2026-w01.md.
+feedback: true
+checks:
+- type: file_exists
+  path: reports/**/2026-w01.md
+- type: file_regex
+  path: reports/**/2026-w01.md
+  regex: '(?s)DONE:.*NEXT:'
+  rule: P17
+- type: labelled_centre
+  label: BOTTLENECK
+  rule: PL2
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: reports/2026-w01.md
+  - rule: P17
+    do:
+      builtin: doc
+      line: |-
+        DONE: releases, priorities, overtime, NCR review
+        NEXT: next week's release plan
+    naive:
+      builtin: doc
+      line: Busy week; all in hand.
+  - rule: PL2
+    fact: weld
+    do:
+      builtin: doc
+      line: 'BOTTLENECK: {constraint}'
+    naive: null
+    stale:
+      builtin: doc
+      line: 'BOTTLENECK: weld'
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: weekly-report

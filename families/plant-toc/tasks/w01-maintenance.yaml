@@ -1,0 +1,42 @@
+id: w01-maintenance
+title: Week 1 maintenance stop
+manager: plant
+week: 1
+date: '2026-04-07'
+groups:
+- 2
+- 13
+prompt: 'Plant manager. Maintenance needs two hours on the welding robot this week for its service. Book the stop: add a row
+  to the downtime table (center, day, start, end, reason).'
+feedback: true
+checks:
+- type: rows_added
+  table: downtime
+  min: 1
+- type: downtime_off_constraint
+  center: weld
+  rule: T3
+fake:
+  steps:
+  - rule: T3
+    fact: weld
+    do:
+      builtin: add_row
+      table: downtime
+      row:
+        center: weld
+        day: '2026-04-07'
+        reason: robot service
+        start: '16:00'
+        end: '18:00'
+    naive:
+      builtin: add_row
+      table: downtime
+      row:
+        center: weld
+        day: '2026-04-07'
+        reason: robot service
+        start: '10:00'
+        end: '12:00'
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: maintenance

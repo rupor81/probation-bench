@@ -1,0 +1,5 @@
+id,name,price,material,std_cost,cut_min,weld_min,paint_min,assy_min
+BR,Bracket,60,20,45,2,4,3,2
+FR,Frame,180,70,120,4,10,4,5
+EN,Enclosure,220,90,185,5,6,10,6
+CL,Clip,8,3,6,1,0,0,1

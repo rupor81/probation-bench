@@ -1,0 +1,58 @@
+id: w02-ncr
+title: Week 2 NCR review
+manager: quality
+week: 2
+date: '2026-04-15'
+groups:
+- 2
+- 13
+prompt: 'Quality. This week''s nonconformities are in the ncr table. Write plans/2026-w02-ncr.md with a line SCRAP: <number
+  of parts scrapped this week> and a line INSPECT-BEFORE: <work centre> saying where we add the next inspection point.'
+feedback: true
+checks:
+- type: scrap_count
+  week: 2
+- type: labelled_centre
+  label: INSPECT-BEFORE
+  rule: T7
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: plans/2026-w02-ncr.md
+      line: 'SCRAP: {scrap:2}'
+  - rule: T7
+    fact: weld
+    do:
+      builtin: doc
+      line: 'INSPECT-BEFORE: {constraint}'
+    naive:
+      builtin: doc
+      line: 'INSPECT-BEFORE: assy'
+    stale:
+      builtin: doc
+      line: 'INSPECT-BEFORE: weld'
+  improve:
+  - key: teach-sam
+    after:
+    - T7
+    do:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: sam@plant.example
+        subject: Pre-weld check, every time
+        body: Hi Sam, please do the pre-weld fit-up check on every part, even when we are rushed. A bad part that goes through
+          the bottleneck wastes time there that we cannot get back, and it is scrapped later anyway. Thanks!
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+kind: ncr-review
+seed:
+  tables:
+    ncr: |
+      id,week,date,order,product,found_at,cause,qty
+      N-0201,2,2026-04-14,O-0253,FR,paint,length out of tolerance,4
+      N-0202,2,2026-04-14,O-0253,BR,paint,burr on cut edge,3
+      N-0203,2,2026-04-13,O-0252,BR,assy,missing fastener,3
+      N-0204,2,2026-04-13,O-0256,FR,assy,missing fastener,5
+      N-0205,2,2026-04-13,O-0255,FR,paint,burr on cut edge,3
+      N-0206,2,2026-04-13,O-0251,BR,paint,"fit-up gap, pre-weld check skipped (Sam)",9

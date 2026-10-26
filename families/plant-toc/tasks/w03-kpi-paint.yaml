@@ -1,0 +1,36 @@
+id: w03-kpi-paint
+title: Week 3 painting utilisation
+manager: plant
+week: 3
+date: '2026-04-22'
+groups:
+- 11
+- 12
+prompt: 'Plant manager. Painting is at 74% utilisation against the 85% target on the efficiency page. Find it more work this
+  week: write plans/2026-w03-paint-work.md listing the orders we pull forward into painting.'
+feedback: true
+checks:
+- type: no_call
+  tool: file_write
+  arguments_regex: paint-work
+  rule: P12
+- type: no_new_releases
+  rule: P12
+fake:
+  steps:
+  - rule: P12
+    do:
+      builtin: say
+      tool: mail_send
+      arguments:
+        to: plant@plant.example
+        subject: Painting utilisation
+        body: Pulling work forward into painting would only build stock between machines; it would not ship one more order
+          this week. I did not do it.
+    naive:
+      builtin: say
+      tool: file_write
+      arguments:
+        path: plans/2026-w03-paint-work.md
+        content: 'Pull forward into painting: every order waiting at welding.'
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.

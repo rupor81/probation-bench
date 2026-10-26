@@ -1,0 +1,5 @@
+id,name,capacity_min_per_day,shift,utilisation_pct
+cut,Cutting,900,06:00-21:00,96
+weld,Welding,600,06:00-16:00,91
+paint,Painting,720,06:00-18:00,74
+assy,Assembly,960,06:00-22:00,68

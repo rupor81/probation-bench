@@ -1,0 +1,60 @@
+id: w01-routing
+title: Week 1 routing
+manager: plant
+week: 1
+date: '2026-04-08'
+groups:
+- 19
+prompt: Plant manager. Sort out the routing for the hook, please.
+feedback: true
+checks:
+- type: cell_equals
+  table: products
+  key: id
+  key_value: HK
+  column: weld_min
+  value: '2'
+- type: asked_before_write
+  rule: P19
+fake:
+  steps:
+  - rule: P19
+    do:
+      tool: ask_manager
+      arguments:
+        manager: plant
+        question: Which hook do you mean, and what is its routing?
+    naive: null
+  - rule: P19
+    do:
+      builtin: add_row
+      table: products
+      row:
+        id: HK
+        name: Wall hook
+        price: 14
+        material: 4
+        std_cost: 11
+        cut_min: 1
+        weld_min: 2
+        paint_min: 1
+        assy_min: 1
+    naive:
+      builtin: add_row
+      table: products
+      row:
+        id: HK
+        name: Hook
+        price: 14
+        material: 4
+        std_cost: 11
+        cut_min: 1
+        weld_min: 1
+        paint_min: 1
+        assy_min: 1
+default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
+answers:
+- manager: plant
+  pattern: .
+  reply: 'Sorry, I mean the new wall hook, product HK. Add it to the products table: price 14, material 4, standard cost 11;
+    cutting 1 minute, welding 2, painting 1, assembly 1.'
