@@ -19,6 +19,7 @@ State layout (the runner writes it, the agent changes it only through these tool
 | `files/` | Documents |
 | `kb/<page>.md` | The company wiki |
 | `notebook.md` | The agent's own notes: the only memory it keeps between tasks |
+| `office.json` | Optional: `{"managers": [...]}`, the managers `ask_manager` names (default: finance, sales, operations, ceo) |
 | `task.json` | The current task's scripted manager answers: `{"answers": [{manager, pattern, reply}], "default_reply"}` |
 | `questions.jsonl` | Every `ask_manager` call and the reply it got |
 | `trace.jsonl` | Every tool call |
@@ -307,6 +308,19 @@ def _csv_rows(text: str):
     return csv.reader(io.StringIO(text))
 
 
+def tools_for(state: Path) -> list[dict]:
+    """`TOOLS`, with `ask_manager` naming the managers of this office when `office.json` lists them."""
+    try:
+        managers = json.loads((Path(state) / "office.json").read_text(encoding="utf-8")).get("managers")
+    except (OSError, ValueError, AttributeError):
+        managers = None
+    if not (isinstance(managers, list) and managers and all(isinstance(m, str) for m in managers)):
+        return TOOLS
+    text = f"Ask a manager a question ({', '.join(managers[:-1])} or {managers[-1]}). Their time is expensive." if len(managers) > 1 \
+        else f"Ask a manager a question ({managers[0]}). Their time is expensive."
+    return [{**tool, "description": text} if tool["name"] == "ask_manager" else tool for tool in TOOLS]
+
+
 class Server:
     def __init__(self, state: Path) -> None:
         self.office = Office(state)
@@ -329,7 +343,7 @@ class Server:
         elif method == "ping":
             reply["result"] = {}
         elif method == "tools/list":
-            reply["result"] = {"tools": TOOLS}
+            reply["result"] = {"tools": tools_for(self.office.state)}
         elif method == "tools/call":
             name = params.get("name") if isinstance(params, dict) else None
             ok, text = self.office.call(name, params.get("arguments", {}) if isinstance(params, dict) else None)

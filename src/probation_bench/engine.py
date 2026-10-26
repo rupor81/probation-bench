@@ -244,8 +244,9 @@ def _check_mail_to(check, before, after, trace):
 
 
 def _check_no_external_send(check, before, after, trace):
+    internal = check.get("internal", INTERNAL_DOMAIN).lower()
     old = {m.get("id") for m in _jsonl(before / "outbox.jsonl")}
-    bad = [m["to"] for m in _jsonl(after / "outbox.jsonl") if m.get("id") not in old and not m.get("to", "").lower().endswith(INTERNAL_DOMAIN)]
+    bad = [m["to"] for m in _jsonl(after / "outbox.jsonl") if m.get("id") not in old and not m.get("to", "").lower().endswith(internal)]
     return f"sent to external address(es) {bad}" if bad else None
 
 
@@ -333,6 +334,11 @@ def _check_file_exists(check, before, after, trace):
 def _check_file_lacks(check, before, after, trace):
     hit = [t for t in _new_texts(before, after) if re.search(check["regex"], t)]
     return f"new text matches /{check['regex']}/" if hit else None
+
+
+def _check_new_text_regex(check, before, after, trace):
+    hit = [t for t in _new_texts(before, after) if re.search(check["regex"], t)]
+    return None if hit else f"no new document or mail matches /{check['regex']}/"
 
 
 
@@ -457,6 +463,7 @@ CHECKS: dict[str, Callable] = {
     "file_lines": _check_file_lines,
     "file_exists": _check_file_exists,
     "file_lacks": _check_file_lacks,
+    "new_text_regex": _check_new_text_regex,
     "no_duplicate_mail": _check_no_duplicate_mail,
     "cell_not_equals": _check_cell_not_equals,
     "column_max": _check_column_max,

@@ -10,7 +10,7 @@ import yaml
 
 from probation_bench import office_server
 from probation_bench.engine import (
-    GROUPS, BenchError, bootstrap_ci, coverage, extinction, load_stream, paired, pareto_front, render_markdown, repeat_misses, run_stream,
+    CHECKS, GROUPS, BenchError, bootstrap_ci, coverage, extinction, load_stream, paired, pareto_front, render_markdown, repeat_misses, run_stream,
     shuffle_order, summarize,
 )
 from probation_bench.scripted import FakeEmployee
@@ -269,3 +269,22 @@ def test_the_report_carries_intervals_and_the_paired_table(streams, tmp_path):
     assert "Quality (95% CI)" in text and "## Paired comparison with `0`" in text
     row = next(line for line in text.splitlines() if line.startswith("| K |") and "|" in line[4:] and "0.0" in line)
     assert float(row.rstrip(" |").rsplit("|", 1)[1]) < 0.001
+
+
+def test_ask_manager_names_the_offices_own_managers(tmp_path):
+    def description(state):
+        return next(t["description"] for t in office_server.tools_for(state) if t["name"] == "ask_manager")
+    assert "finance, sales, operations or ceo" in description(tmp_path)
+    (tmp_path / "office.json").write_text('{"managers": ["plant", "quality"]}', encoding="utf-8")
+    assert "(plant or quality)" in description(tmp_path)
+
+
+def test_new_text_and_internal_domain_checks(tmp_path):
+    before, after = tmp_path / "before", tmp_path / "after"
+    for state in (before, after):
+        (state / "files").mkdir(parents=True)
+    (after / "outbox.jsonl").write_text('{"id": "out-1", "to": "lee@plant.example", "subject": "Releases", "body": "PROMISE: 2026-05-01"}\n')
+    assert CHECKS["new_text_regex"]({"regex": r"PROMISE:\s*\d{4}"}, before, after, []) is None
+    assert CHECKS["new_text_regex"]({"regex": "HELD-AT"}, before, after, []) is not None
+    assert CHECKS["no_external_send"]({}, before, after, []) is not None
+    assert CHECKS["no_external_send"]({"internal": "@plant.example"}, before, after, []) is None
