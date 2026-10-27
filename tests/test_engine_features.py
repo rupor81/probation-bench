@@ -126,3 +126,64 @@ def test_the_learning_curve_groups_a_kind_by_week_and_by_thirds(family, tmp_path
     assert [t["passed"] for t in curve["thirds"]] == [0, 1, 1]
     text = render_markdown({"learner": summary})
     assert "## Learning curve by task kind" in text and "| weekly-note |" in text
+
+
+def _deal_family(tmp_path: Path) -> Path:
+    """Two days of one deal: day 1 the agent drafts a cold mail; day 2 the head of sales sends drafts to the buyer, and
+    the buyer answers only if the mail went out and was dated day 1 or later."""
+    root = tmp_path / "deal"
+    for sub in ("tables", "kb", "files"):
+        (root / "office-base" / sub).mkdir(parents=True)
+    _write(root / "office-base" / "notebook.md", "")
+    _write(root / "rulebook" / "sales.yaml", {"manager": "sales", "rules": {"S": {"title": "Follow up", "groups": [2],
+                                                                                    "correction": "Answer the buyer the same day."}}})
+    draft = {"tool": "mail_draft", "arguments": {"to": "cfo@buyer.example", "subject": "Hello", "body": "Can we talk?"}}
+    reply = {"tool": "mail_send", "arguments": {"to": "cfo@buyer.example", "subject": "Re: call", "body": "Tuesday works."}}
+    day1 = {"id": "d1", "title": "Day 1", "manager": "sales", "groups": [2], "date": "2026-06-01", "prompt": "Draft outreach.",
+            "checks": [{"type": "mail_to", "to": "cfo@buyer.example", "folder": "drafts"}], "fake": {"steps": [{"do": draft}]}}
+    day2 = {"id": "d2", "title": "Day 2", "manager": "sales", "groups": [2], "date": "2026-06-02", "prompt": "Work the inbox.",
+            "seed": {"release_drafts": "buyer\\.example"}, "checks": [{"type": "file_exists", "path": "*"}], "fake": {"steps": []},
+            "reactions": [{"id": "deal-a", "outcome": True, "cases": [
+                {"name": "answered", "when": [{"type": "mail_to", "to": "cfo@buyer.example", "folder": "outbox"},
+                                              {"type": "mail_to", "to": "nobody@buyer.example", "not": True}],
+                 "seed": {"inbox": [{"id": "b1", "from": "cfo@buyer.example", "to": "me", "subject": "call", "body": "When?"}]},
+                 "checks": [{"type": "mail_to", "to": "cfo@buyer.example", "folder": "outbox", "rule": "S"}],
+                 "steps": [{"rule": "S", "do": reply, "naive": {"tool": "notebook_read", "arguments": {}}}]},
+                {"name": "silent"}]}]}
+    for t in (day1, day2):
+        _write(root / "tasks" / f"{t['id']}.yaml", t)
+    _write(root / "stream-a.yaml", {"id": "a", "tasks": [{"task": "d1"}, {"task": "d2"}]})
+    return root
+
+
+def test_reactions_dated_mail_and_released_drafts(tmp_path):
+    stream = load_stream(_deal_family(tmp_path), "a")
+    results = run_stream(stream, tmp_path / "o", FakeEmployee(oracle=True))
+    assert [r.reactions for r in results] == [{}, {"deal-a": "answered"}]
+    office = tmp_path / "o" / "office"
+    outbox = [__import__("json").loads(line) for line in (office / "outbox.jsonl").read_text().splitlines()]
+    assert [(m["subject"], m["date"], m.get("released")) for m in outbox] == [("Hello", "2026-06-01", "2026-06-02"),
+                                                                           ("Re: call", "2026-06-02", None)]
+    assert not (office / "drafts.jsonl").read_text().strip()
+    summary = summarize(stream, results)
+    assert summary["outcomes"] == {"deal-a": "answered"} and results[1].violations == []
+    assert "## Outcomes" in render_markdown({"oracle": summary}) and "| deal-a | answered |" in render_markdown({"oracle": summary})
+    learner = run_stream(stream, tmp_path / "l", FakeEmployee())
+    assert learner[1].violations == ["S"]
+
+
+def test_without_the_earlier_mail_the_buyer_stays_silent(tmp_path):
+    root = _deal_family(tmp_path)
+    stream = load_stream(root, "a")
+    results = run_stream(stream, tmp_path / "s", lambda state, task: None)
+    assert results[1].reactions == {"deal-a": "silent"} and summarize(stream, results)["outcomes"] == {"deal-a": "silent"}
+
+
+def test_a_reaction_case_cannot_set_unknown_keys(tmp_path):
+    root = _deal_family(tmp_path)
+    path = root / "tasks" / "d2.yaml"
+    task = yaml.safe_load(path.read_text())
+    task["reactions"][0]["cases"][1]["prompt"] = "x"
+    path.write_text(yaml.safe_dump(task))
+    with pytest.raises(BenchError, match="cannot set"):
+        load_stream(root, "a")

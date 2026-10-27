@@ -4,9 +4,13 @@ A family folder (`families/<name>/`) holds `office-base/` (the starting office),
 rules and the correction each manager posts when one is broken), `tasks/<id>.yaml` and `stream-<id>.yaml` (the
 order). `run_stream` copies the base office into a working directory and, for each task in order:
 
-1. applies the task's seed (inbox mail, tables, files) and writes `task.json` (the scripted manager answers);
-2. snapshots the office (`snapshots/<task>/before`), hands the prompt to `agent(office_dir, task)`, then
-   snapshots again (`.../after`) and moves the task's trace to `snapshots/<task>/trace.jsonl`;
+1. swaps in the task's `instead` when one of its `unless` conditions holds, adds the matching case of each of its
+   `reactions` (how the outside world answers what the agent did earlier, e.g. a buyer's reply; reactions see the
+   seed's `release_drafts` already done: drafts to matching addresses go out, as if their owner sent them), then
+   applies the seed (inbox mail, tables, files) and writes `task.json` (the scripted manager answers);
+2. snapshots the office (`snapshots/<task>/before`), hands the prompt to `agent(office_dir, task)`, stamps the mail
+   the agent wrote with the task's `date`, then snapshots again (`.../after`) and moves the task's trace to
+   `snapshots/<task>/trace.jsonl`;
 3. runs the task's checks. A failing check that names a `rule` is a violation of that rule; one that does not is a
    failed goal;
 4. posts the rulebook's correction for every violated rule into the inbox, unless the task is `feedback: false`
@@ -74,6 +78,8 @@ class TaskResult:
     week: int | None = None
     variant: str | None = None
     """`instead` when the task's `unless` held (the office had already changed what the task would otherwise seed)."""
+    reactions: dict[str, str] = field(default_factory=dict)
+    """Reaction id -> the case the office chose for this task (see `run_stream`)."""
 
 
 @dataclass(frozen=True)
@@ -174,6 +180,7 @@ def load_stream(root: Path, stream_id: str) -> Stream:
             unknown_keys = sorted(set(task["instead"]) - {"seed", "checks", "fake", "prompt", "answers", "default_reply"})
             if unknown_keys:
                 raise BenchError(f"task {task_id}: `instead` cannot change {unknown_keys}")
+        _check_reactions(task, checks, rules)
         if "week" in task and not (isinstance(task["week"], int) and task["week"] >= 1):
             raise BenchError(f"task {task_id}: bad week")
         for key in ("half", "after"):
@@ -186,6 +193,36 @@ def load_stream(root: Path, stream_id: str) -> Stream:
             if earlier in position and position[earlier] > position[task_id]:
                 raise BenchError(f"task {task_id} must come after {earlier}")
     return Stream(stream_id, root, entries, tasks, rules, spec.get("dials") or {}, checks, builtins)
+
+
+_CASE_KEYS = {"name", "when", "seed", "checks", "steps", "answers"}
+
+
+def _check_reactions(task: dict, checks: dict[str, Callable], rules: dict) -> None:
+    reactions = task.get("reactions")
+    if reactions is None:
+        return
+    where = f"task {task['id']}"
+    if not isinstance(reactions, list):
+        raise BenchError(f"{where}: `reactions` must be a list")
+    ids = set()
+    for reaction in reactions:
+        if not isinstance(reaction, dict) or not isinstance(reaction.get("id"), str) or reaction["id"] in ids:
+            raise BenchError(f"{where}: every reaction needs a unique id")
+        ids.add(reaction["id"])
+        cases = reaction.get("cases")
+        if not isinstance(cases, list) or not cases:
+            raise BenchError(f"{where} reaction {reaction['id']}: `cases` must be a non-empty list")
+        names = set()
+        for case in cases:
+            if not isinstance(case, dict) or not isinstance(case.get("name"), str) or case["name"] in names:
+                raise BenchError(f"{where} reaction {reaction['id']}: every case needs a unique name")
+            names.add(case["name"])
+            unknown = sorted(set(case) - _CASE_KEYS)
+            if unknown:
+                raise BenchError(f"{where} reaction {reaction['id']}: a case cannot set {unknown}")
+            for check in [*case.get("when", []), *case.get("checks", [])]:
+                _known_check(check, checks, rules, f"{where} reaction {reaction['id']}")
 
 
 # office state ---------------------------------------------------------------
@@ -202,6 +239,19 @@ def _table(state: Path, name: str) -> list[dict[str, str]]:
     return list(csv.DictReader(io.StringIO(path.read_text(encoding="utf-8")))) if path.is_file() else []
 
 
+def _release_drafts(state: Path, task: dict) -> None:
+    """Move the drafts whose `to` matches the seed's `release_drafts` to the outbox: their owner reviewed and sent them."""
+    pattern = (task.get("seed") or {}).get("release_drafts")
+    if not pattern:
+        return
+    drafts = _jsonl(state / "drafts.jsonl")
+    released = [m for m in drafts if re.search(pattern, m.get("to", ""), re.IGNORECASE)]
+    _write_jsonl(state / "drafts.jsonl", [m for m in drafts if m not in released])
+    for message in released:
+        with (state / "outbox.jsonl").open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps({**message, "released": task.get("date") or True}, sort_keys=True) + "\n")
+
+
 def _seed(state: Path, task: dict) -> None:
     seed = task.get("seed") or {}
     for message in seed.get("inbox", []):
@@ -215,6 +265,42 @@ def _seed(state: Path, task: dict) -> None:
         target.write_text(text, encoding="utf-8")
     (state / "task.json").write_text(
         json.dumps({"answers": task.get("answers", []), "default_reply": task.get("default_reply", "")}), encoding="utf-8")
+
+
+def _write_jsonl(path: Path, records: list[dict]) -> None:
+    path.write_text("".join(json.dumps(r, sort_keys=True) + "\n" for r in records), encoding="utf-8")
+
+
+def _stamp_mail(state: Path, date: str) -> None:
+    """Give the mail the agent wrote during a task that task's date, so a later check can tell when a message went out."""
+    for folder in ("outbox", "drafts"):
+        path = state / f"{folder}.jsonl"
+        records = _jsonl(path)
+        if any("date" not in r for r in records):
+            _write_jsonl(path, [r if "date" in r else {**r, "date": date} for r in records])
+
+
+def _react(stream: Stream, task: dict, state: Path, empty: Path) -> tuple[dict, dict[str, str]]:
+    """Apply, for each of the task's `reactions`, the first case whose `when` conditions all hold on the office (a
+    condition with `not: true` must fail; a case without `when` always matches). The case's seed inbox, checks, fake
+    steps and answers are added to the task's own; its tables and files replace the task's."""
+    chosen: dict[str, str] = {}
+    for reaction in task.get("reactions", []):
+        for case in reaction["cases"]:
+            if all(_holds(stream, c, state, empty) != bool(c.get("not")) for c in case.get("when", [])):
+                break
+        else:
+            continue
+        chosen[reaction["id"]] = case["name"]
+        seed, extra = dict(task.get("seed") or {}), case.get("seed") or {}
+        seed["inbox"] = [*seed.get("inbox", []), *extra.get("inbox", [])]
+        for key in ("tables", "files"):
+            seed[key] = {**(seed.get(key) or {}), **(extra.get(key) or {})}
+        fake = dict(task.get("fake") or {"steps": []})
+        fake["steps"] = [*fake.get("steps", []), *case.get("steps", [])]
+        task = {**task, "seed": seed, "fake": fake, "checks": [*task["checks"], *case.get("checks", [])],
+                "answers": [*task.get("answers", []), *case.get("answers", [])]}
+    return task, chosen
 
 
 def _snapshot(state: Path, target: Path) -> None:
@@ -505,6 +591,8 @@ def run_stream(stream: Stream, workdir: Path, agent: Callable[[Path, dict], floa
         variant = None
         if task.get("unless") and _holds_any(stream, task["unless"], state, workdir / "empty"):
             task, variant = {**task, **task["instead"]}, "instead"
+        _release_drafts(state, task)
+        task, chosen = _react(stream, task, state, workdir / "empty")
         _seed(state, task)
         shown = task
         if task.get("date"):
@@ -521,6 +609,8 @@ def run_stream(stream: Stream, workdir: Path, agent: Callable[[Path, dict], floa
         questions_before = len(_jsonl(state / "questions.jsonl"))
         _snapshot(state, snaps / "before")
         cost = agent(state, shown)
+        if task.get("date"):
+            _stamp_mail(state, str(task["date"]))
         _snapshot(state, snaps / "after")
         trace = _jsonl(state / "trace.jsonl")
         shutil.copyfile(state / "trace.jsonl", snaps / "trace.jsonl") if (state / "trace.jsonl").is_file() else (snaps / "trace.jsonl").write_text("")
@@ -550,7 +640,7 @@ def run_stream(stream: Stream, workdir: Path, agent: Callable[[Path, dict], floa
         results.append(TaskResult(task["id"], level, goal_ok, violations, checked, failed, len(trace),
                                   len(_jsonl(state / "questions.jsonl")) - questions_before, posted,
                                   list(task["groups"]), bool(task.get("anchor")), round(float(cost or 0.0), 6),
-                                  task.get("kind"), task.get("week"), variant))
+                                  task.get("kind"), task.get("week"), variant, chosen))
         if on_result:
             on_result(results[-1])
     return results
@@ -560,11 +650,15 @@ def run_stream(stream: Stream, workdir: Path, agent: Callable[[Path, dict], floa
 read_jsonl, read_table, files_matching, new_texts, new_rows = _jsonl, _table, _files_matching, _new_texts, _new_rows
 
 
-def _holds_any(stream: Stream, conditions: list[dict], state: Path, empty: Path) -> bool:
-    """Whether any condition holds on the office as it stands: each is a check run against an empty office as "before",
-    so a `mail_to` or `file_regex` condition sees everything since the stream began."""
+def _holds(stream: Stream, condition: dict, state: Path, empty: Path) -> bool:
+    """Whether a condition holds on the office as it stands: it is a check run against an empty office as "before", so a
+    `mail_to` or `file_regex` condition sees everything since the stream began."""
     empty.mkdir(parents=True, exist_ok=True)
-    return any(stream.checks[c["type"]](c, empty, state, []) is None for c in conditions)
+    return stream.checks[condition["type"]](condition, empty, state, []) is None
+
+
+def _holds_any(stream: Stream, conditions: list[dict], state: Path, empty: Path) -> bool:
+    return any(_holds(stream, c, state, empty) for c in conditions)
 
 
 # metrics --------------------------------------------------------------------
@@ -714,6 +808,7 @@ def summarize(stream: Stream, results: list[TaskResult]) -> dict[str, Any]:
         "repeat_misses": repeat_misses(results),
         "learning_curve": learning_curve(results),
         "prevented": [r.task for r in results if r.variant == "instead"],
+        "outcomes": _outcomes(stream, results),
         "goal_rate": round(sum(r.goal_ok for r in results) / len(results), 4) if results else 0.0,
         "by_level": {lv: round(sum(_passed(r) for r in results if r.level == lv) / n, 4)
                      for lv in ("base", "raised") if (n := sum(r.level == lv for r in results))},
@@ -726,6 +821,15 @@ def summarize(stream: Stream, results: list[TaskResult]) -> dict[str, Any]:
                    "corrections": sum(len(r.corrections) for r in results), "cost_usd": round(sum(r.cost_usd for r in results), 4)},
         "coverage": coverage(stream),
     }
+
+
+def _outcomes(stream: Stream, results: list[TaskResult]) -> dict[str, str]:
+    """Reaction id -> the case chosen, for reactions marked `outcome: true` (e.g. how a deal ended); the last one wins."""
+    out: dict[str, str] = {}
+    for result in results:
+        marked = {r["id"] for r in stream.tasks.get(result.task, {}).get("reactions", []) if r.get("outcome")}
+        out.update({k: v for k, v in result.reactions.items() if k in marked})
+    return dict(sorted(out.items()))
 
 
 def pareto_front(points: dict[str, dict[str, float]]) -> list[str]:
@@ -783,6 +887,10 @@ def render_markdown(summaries: dict[str, dict[str, Any]], costs: dict[str, float
             out.append(f"| {kind} | " + " | ".join(cells) + " |")
         out += ["", "Staff mistakes the office no longer seeded, because the agent had already dealt with them: " +
                 ", ".join(f"{a} {len(summaries[a].get('prevented', []))}" for a in arms)]
+    outcome_ids = sorted({o for a in arms for o in summaries[a].get("outcomes", {})})
+    if outcome_ids:
+        out += ["", "## Outcomes", "", "| Outcome | " + " | ".join(arms) + " |", "| --- | " + " | ".join("---" for _ in arms) + " |"]
+        out += [f"| {o} | " + " | ".join(summaries[a].get("outcomes", {}).get(o, "-") for a in arms) + " |" for o in outcome_ids]
     out += ["", "## Pass rate by group, early half / late half", "", "| Group | " + " | ".join(arms) + " |", "| --- | " + " | ".join("---" for _ in arms) + " |"]
     for group in sorted({g for a in arms for g in summaries[a]["groups"]}, key=int):
         cells = []
