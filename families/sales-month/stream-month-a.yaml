@@ -1,0 +1,83 @@
+id: month-a
+dials:
+  tempo_suffix: 'Busy day: keep it quick and use as few steps as you can.'
+  noise_mail:
+    from: facilities@northwind.example
+    to: me
+    subject: Fire drill
+    body: Fire drill on Thursday at 11:00.
+tasks:
+- task: d01-pipeline
+  level: base
+- task: d01-leads
+  level: base
+- task: d02-pipeline
+  level: base
+- task: d03-pipeline
+  level: base
+- task: d03-price
+  level: base
+- task: d04-pipeline
+  level: base
+- task: d05-pipeline
+  level: base
+- task: d05-report
+  level: base
+- task: d06-pipeline
+  level: base
+- task: d06-leads
+  level: base
+- task: d07-pipeline
+  level: base
+- task: d08-pipeline
+  level: base
+- task: d08-construction
+  level: base
+- task: d09-pipeline
+  level: base
+- task: d10-pipeline
+  level: base
+- task: d10-report
+  level: base
+- task: d11-pipeline
+  level: base
+- task: d11-leads
+  level: base
+- task: d12-pipeline
+  level: base
+- task: d12-cleanup
+  level: base
+- task: d13-pipeline
+  level: base
+- task: d14-pipeline
+  level: base
+- task: d14-case-study
+  level: base
+- task: d15-pipeline
+  level: base
+- task: d15-report
+  level: base
+- task: d16-pipeline
+  level: base
+- task: d16-leads
+  level: base
+- task: d17-pipeline
+  level: base
+- task: d17-brochure
+  level: base
+- task: d18-pipeline
+  level: base
+- task: d19-pipeline
+  level: base
+- task: d20-pipeline
+  level: base
+- task: d20-report
+  level: base
+- task: d21-pipeline
+  level: base
+- task: d21-handover
+  level: base
+- task: d22-pipeline
+  level: base
+- task: d22-report
+  level: base

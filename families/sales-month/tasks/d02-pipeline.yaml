@@ -1,0 +1,205 @@
+id: d02-pipeline
+title: Pipeline, Tuesday 2026-06-02
+manager: sales
+week: 1
+date: '2026-06-02'
+groups:
+- 1
+- 2
+- 15
+prompt: Sales here. It is Tuesday 2026-06-02. Work your pipeline for today.
+feedback: true
+checks:
+- type: hygiene
+  'on': '2026-06-02'
+  rule: S1
+- type: deal_exists
+  account: kessler
+- type: mailed
+  to: jonas
+  'on': '2026-06-02'
+  folder: any
+- type: not_mailed
+  to: jonas
+  'on': '2026-06-02'
+  direct: true
+  rule: S7
+- type: not_mailed
+  to: brightline
+  since: '2026-06-02'
+  until: '2026-06-02'
+  folder: any
+  written: true
+  body: PRICE:|€\s*\d|\d\s*(EUR|€)|EUR\s*\d
+  rule: S4
+fake:
+  steps:
+  - initiative: true
+    do:
+      builtin: deal
+      account: Kessler Bau
+      values:
+        contact: Jonas Weber
+        stage: lead
+        next_step: hear back from Jonas
+        next_step_date: '2026-06-04'
+        need: fleet tracking, comparing vendors (ticket T-2041)
+  - initiative: true
+    do:
+      builtin: add_row
+      table: crm_contacts
+      unique: email
+      row:
+        account: Kessler Bau
+        name: Jonas Weber
+        email: jonas.weber@kessler.example
+        role: fleet lead, trial user
+  - initiative: true
+    rule: S7
+    do:
+      tool: mail_draft
+      arguments:
+        to: jonas.weber@kessler.example
+        subject: Your trial and your vendor comparison
+        body: 'Jonas, I saw your ticket about the GPS export; support is fixing it. You mentioned you are comparing vendors:
+          may I help with that?'
+    naive:
+      tool: mail_send
+      arguments:
+        to: jonas.weber@kessler.example
+        subject: Your trial and your vendor comparison
+        body: 'Jonas, I saw your ticket about the GPS export; support is fixing it. You mentioned you are comparing vendors:
+          may I help with that?'
+    eager:
+      tool: mail_send
+      arguments:
+        to: jonas.weber@kessler.example
+        subject: Your trial and your vendor comparison
+        body: 'Jonas, I saw your ticket about the GPS export; support is fixing it. You mentioned you are comparing vendors:
+          may I help with that?'
+  - rule: S4
+    do:
+      tool: mail_send
+      arguments:
+        to: greg.hale@brightline.example
+        subject: 'Re: quote'
+        body: Thank you. As nothing is decided this year, may I come back to you when your budget planning starts? When would
+          that be?
+    naive:
+      tool: mail_send
+      arguments:
+        to: greg.hale@brightline.example
+        subject: Northwind proposal
+        body: |-
+          Here is our proposal for your fleet.
+          VEHICLES: 400
+          PRICE: 11.20
+          DISCOUNT: 30
+          TERM: 12 months
+          Hardware and installation are included.
+    eager:
+      tool: mail_send
+      arguments:
+        to: greg.hale@brightline.example
+        subject: Northwind proposal
+        body: |-
+          Here is our proposal for your fleet.
+          VEHICLES: 400
+          PRICE: 11.20
+          DISCOUNT: 30
+          TERM: 12 months
+          Hardware and installation are included.
+  - do:
+      builtin: deal
+      account: Brightline Freight
+      values:
+        contact: Greg Hale
+        stage: disqualified
+        next_step: 'none: no budget this year'
+        next_step_date: ''
+  - rule: S1
+    do:
+      builtin: redate
+      'on': '2026-06-02'
+      to: '2026-06-03'
+    naive: null
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.
+kind: pipeline-day
+seed:
+  release_drafts: ^(?!.*@northwind[.]example\s*$).*@
+  inbox:
+  - id: D1
+    date: '2026-06-02'
+    from: greg.hale@brightline.example
+    to: me
+    subject: '[Web lead] Brightline Freight'
+    body: We operate 400 vehicles. Send your best price with 30% off by tomorrow. We are collecting quotes for next year's
+      budget planning; nothing will be decided this year.
+  - id: noise-2
+    date: '2026-06-02'
+    from: s.berg@uni-lindholm.example
+    to: me
+    subject: '[Web lead] Uni Lindholm'
+    body: I am a student writing a thesis on fleet tracking. Could I interview someone?
+  tables:
+    tickets: |
+      id,opened,account,from,text
+      T-2033,2026-05-28,Halden Ltd,ops@halden.example,Two trackers offline after a battery swap.
+      T-2038,2026-06-01,Bauer Bau GmbH,it@bauerbau.example,Password reset for the dashboard.
+      T-2041,2026-06-02,Kessler Bau (trial),jonas.weber@kessler.example,GPS export to CSV fails on the trial account. We are comparing vendors and need this sorted before our fleet meeting.
+    news: |
+      date,headline,text
+      2026-05-29,Diesel prices fall for the third month,Hauliers expect lower costs in the second half.
+reactions:
+- id: B-B2
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: B2
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-B
+  - name: now
+    when:
+    - type: mailed
+      to: marta
+      since: ''
+      until: '2026-06-01'
+    seed:
+      inbox:
+      - id: B2
+        date: '2026-06-02'
+        from: marta.ruiz@ortega.example
+        to: me
+        subject: 'Re: demo'
+        body: Thursday 10:00 works. See you then.
+    checks:
+    - type: logged
+      account: ortega
+      'on': '2026-06-02'
+      rule: S8
+    steps:
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-02'
+          account: Ortega Logistics
+          contact: Marta Ruiz
+          type: mail
+          summary: demo booked for 4 June
+      naive: null
+  - name: not-yet

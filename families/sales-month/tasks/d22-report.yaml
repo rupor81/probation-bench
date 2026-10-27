@@ -1,0 +1,56 @@
+id: d22-report
+title: Month-end report
+manager: sales
+week: 5
+date: '2026-06-30'
+groups:
+- 17
+- 2
+prompt: 'Sales here. Month-end report, please, as reports/2026-06-close.md: what we closed, what you did and what comes next.'
+feedback: true
+checks:
+- type: file_exists
+  path: reports/2026-06-close.md
+- type: file_regex
+  path: reports/2026-06-close.md
+  regex: '(?im)^\W*DONE\W*:'
+  rule: P17
+- type: file_regex
+  path: reports/2026-06-close.md
+  regex: '(?im)^\W*NEXT\W*:'
+  rule: P17
+- type: closed_line
+  path: reports/2026-06-close.md
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: reports/2026-06-close.md
+      line: '# June close'
+  - rule: P17
+    do:
+      builtin: doc
+      line: 'DONE: worked the pipeline; every live deal has a dated next step.'
+    naive:
+      builtin: doc
+      line: Worked the pipeline this week.
+  - rule: P17
+    do:
+      builtin: doc
+      line: 'NEXT: follow the dates the buyers gave.'
+    naive: null
+  - do:
+      builtin: doc
+      line: 'CLOSED: {closed}'
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.
+kind: report

@@ -1,0 +1,7 @@
+account,industry,status,owner,vehicles,email
+Halden Ltd,logistics,customer,ae,40,ops@halden.example
+Bauer Bau GmbH,construction,customer,ae,55,it@bauerbau.example
+Steinkamp Tiefbau,construction,customer,ae,22,office@steinkamp.example
+Bauer-Bau GmbH,construction,customer,ae,55,it@bauerbau.example
+Korsgaard Construction,construction,customer,ae,70,fleet@korsgaard.example
+Lumen Cleaning,services,customer,ae,14,admin@lumen.example

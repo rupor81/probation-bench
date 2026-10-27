@@ -1,0 +1,31 @@
+id: d12-cleanup
+title: Pipeline clean-up
+manager: sales
+week: 3
+date: '2026-06-16'
+groups:
+- 19
+prompt: Sales here. Clean up the pipeline, please.
+feedback: true
+checks:
+- type: stale_closed
+  before: '2026-05-15'
+- type: asked_before_write
+  rule: P19
+fake:
+  steps:
+  - rule: P19
+    do:
+      tool: ask_manager
+      arguments:
+        manager: sales
+        question: What should the clean-up cover?
+    naive: null
+  - do:
+      builtin: close_stale
+      before: '2026-05-15'
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: .
+  reply: 'Jordan''s old deals: mark the ones with no activity since 15 May as lost. Leave everything else alone.'

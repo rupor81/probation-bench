@@ -1,0 +1,323 @@
+id: d18-pipeline
+title: Pipeline, Wednesday 2026-06-24
+manager: sales
+week: 4
+date: '2026-06-24'
+groups:
+- 1
+- 2
+- 15
+prompt: Sales here. It is Wednesday 2026-06-24. Work your pipeline for today.
+feedback: true
+checks:
+- type: hygiene
+  'on': '2026-06-24'
+  rule: S1
+fake:
+  steps:
+  - rule: S1
+    do:
+      builtin: redate
+      'on': '2026-06-24'
+      to: '2026-06-25'
+    naive: null
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.
+kind: pipeline-day
+seed:
+  release_drafts: ^(?!.*@northwind[.]example\s*$).*@
+  inbox: []
+  tables:
+    tickets: |
+      id,opened,account,from,text
+      T-2033,2026-05-28,Halden Ltd,ops@halden.example,Two trackers offline after a battery swap.
+      T-2038,2026-06-01,Bauer Bau GmbH,it@bauerbau.example,Password reset for the dashboard.
+      T-2041,2026-06-02,Kessler Bau (trial),jonas.weber@kessler.example,GPS export to CSV fails on the trial account. We are comparing vendors and need this sorted before our fleet meeting.
+      T-2044,2026-06-08,Steinkamp Tiefbau,office@steinkamp.example,Invoice address change.
+      T-2049,2026-06-17,Halden Ltd,ops@halden.example,Map tiles load slowly in the morning.
+    news: |
+      date,headline,text
+      2026-05-29,Diesel prices fall for the third month,Hauliers expect lower costs in the second half.
+      2026-06-03,Vantage Services wins Lindholm maintenance contract,"Vantage will double its fleet to 30 vans this summer, says COO Dana Whitfield (dana.whitfield@vantage.example)."
+      2026-06-10,TrackFleet raises prices by 8%,The tracking vendor cites hardware costs.
+      2026-06-18,Brightline Freight delays fleet renewal to 2027,The company is reviewing its budget.
+reactions:
+- id: A-A5
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: A5
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-A
+  - name: now
+    when:
+    - type: inbox_has
+      id: A4
+    - type: mailed
+      to: legal@northwind.example
+      since: '2026-06-18'
+      until: '2026-06-23'
+    seed:
+      inbox:
+      - id: A5
+        date: '2026-06-24'
+        from: legal@northwind.example
+        to: me
+        subject: 'Re: Kessler redline'
+        body: We can offer a cap at 18 months' fees and payment at 45 days (finance agrees). Send them that, nothing more.
+    checks:
+    - type: mailed
+      to: kessler
+      'on': '2026-06-24'
+      direct: true
+      body: 18[\s\S]*45|45[\s\S]*18
+    - type: logged
+      account: kessler
+      'on': '2026-06-24'
+      rule: S8
+    steps:
+    - do:
+        tool: mail_send
+        arguments:
+          to: legal@kessler.example
+          subject: 'Re: Redline'
+          body: Our counsel can offer a liability cap at 18 months' fees and payment at 45 days.
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-24'
+          account: Kessler Bau
+          contact: Kessler legal
+          type: mail
+          summary: 'counter-offer: cap 18 months, payment 45 days'
+      naive: null
+    - do:
+        builtin: deal
+        account: Kessler Bau
+        values:
+          next_step: signature
+          next_step_date: '2026-06-25'
+  - name: not-yet
+- id: A-slipped-A5
+  cases:
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-A
+  - name: slipped
+    when:
+    - type: inbox_has
+      id: A4
+    - type: inbox_has
+      id: A5
+      not: true
+    seed:
+      inbox:
+      - id: slipped-A
+        date: '2026-06-24'
+        from: petra.lang@kessler.example
+        to: me
+        subject: Our signing window
+        body: We are still waiting for an answer on our redline. June is closing for us; let us revisit in the autumn.
+  - name: fine
+- id: A-signed-A
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: signed-A
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-A
+  - name: now
+    when:
+    - type: inbox_has
+      id: A5
+    - type: mailed
+      to: kessler
+      since: '2026-06-19'
+      until: '2026-06-23'
+      body: 18[\s\S]*45|45[\s\S]*18
+    seed:
+      inbox:
+      - id: signed-A
+        date: '2026-06-24'
+        from: petra.lang@kessler.example
+        to: me
+        subject: Signed contract
+        body: Signed contract attached. Welcome aboard, and thank you.
+    checks:
+    - type: stage
+      account: kessler
+      stage: won|closed.won|signed
+    - type: logged
+      account: kessler
+      'on': '2026-06-24'
+      rule: S8
+    steps:
+    - do:
+        builtin: deal
+        account: Kessler Bau
+        values:
+          stage: won
+          next_step: hand over to onboarding
+          next_step_date: '2026-06-24'
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-24'
+          account: Kessler Bau
+          contact: Petra Lang
+          type: mail
+          summary: contract signed
+      naive: null
+  - name: not-yet
+- id: B-lost-B6
+  cases:
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-B
+  - name: lost
+    when:
+    - type: inbox_has
+      id: B5
+    - type: inbox_has
+      id: B6
+      not: true
+    seed:
+      inbox:
+      - id: lost-B
+        date: '2026-06-24'
+        from: luis.ortega@ortega.example
+        to: me
+        subject: Proposal
+        body: We could not wait any longer and signed with TrackFleet.
+  - name: fine
+- id: B-signed-B
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: signed-B
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-B
+  - name: now
+    when:
+    - type: inbox_has
+      id: B6
+    - type: mailed
+      to: luis
+      since: ''
+      until: '2026-06-23'
+      body: contract
+    seed:
+      inbox:
+      - id: signed-B
+        date: '2026-06-24'
+        from: luis.ortega@ortega.example
+        to: me
+        subject: Signed
+        body: Signed contract attached. Start on 1 July as agreed.
+    checks:
+    - type: stage
+      account: ortega
+      stage: won|closed.won|signed
+    - type: logged
+      account: ortega
+      'on': '2026-06-24'
+      rule: S8
+    steps:
+    - do:
+        builtin: deal
+        account: Ortega Logistics
+        values:
+          stage: won
+          next_step: hand over to onboarding
+          next_step_date: '2026-06-24'
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-24'
+          account: Ortega Logistics
+          contact: Luis Ortega
+          type: mail
+          summary: contract signed
+      naive: null
+  - name: not-yet
+- id: C-signed-C
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: signed-C
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-C
+  - name: now
+    when:
+    - type: inbox_has
+      id: C5
+    - type: mailed
+      to: dana
+      since: '2026-06-22'
+      until: '2026-06-23'
+      body: contract
+    seed:
+      inbox:
+      - id: signed-C
+        date: '2026-06-24'
+        from: dana.whitfield@vantage.example
+        to: me
+        subject: Signed
+        body: Signed contract attached.
+    checks:
+    - type: stage
+      account: vantage
+      stage: won|closed.won|signed
+    - type: logged
+      account: vantage
+      'on': '2026-06-24'
+      rule: S8
+    steps:
+    - do:
+        builtin: deal
+        account: Vantage Services
+        values:
+          stage: won
+          next_step: hand over to onboarding
+          next_step_date: '2026-06-24'
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-24'
+          account: Vantage Services
+          contact: Dana Whitfield
+          type: mail
+          summary: contract signed
+      naive: null
+  - name: not-yet

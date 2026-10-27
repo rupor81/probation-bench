@@ -1,0 +1,244 @@
+id: d03-pipeline
+title: Pipeline, Wednesday 2026-06-03
+manager: sales
+week: 1
+date: '2026-06-03'
+groups:
+- 1
+- 2
+- 15
+prompt: Sales here. It is Wednesday 2026-06-03. Work your pipeline for today.
+feedback: true
+checks:
+- type: hygiene
+  'on': '2026-06-03'
+  rule: S1
+- type: deal_exists
+  account: vantage
+- type: mailed
+  to: dana
+  'on': '2026-06-03'
+  folder: any
+- type: not_mailed
+  to: dana
+  'on': '2026-06-03'
+  direct: true
+  rule: S7
+fake:
+  steps:
+  - initiative: true
+    do:
+      builtin: deal
+      account: Vantage Services
+      values:
+        contact: Dana Whitfield
+        stage: lead
+        next_step: hear back from Dana
+        next_step_date: '2026-06-05'
+        need: fleet doubling to 30 vans (news 3 June)
+  - initiative: true
+    do:
+      builtin: add_row
+      table: crm_contacts
+      unique: email
+      row:
+        account: Vantage Services
+        name: Dana Whitfield
+        email: dana.whitfield@vantage.example
+        role: COO
+  - initiative: true
+    rule: S7
+    do:
+      tool: mail_draft
+      arguments:
+        to: dana.whitfield@vantage.example
+        subject: Your new contract
+        body: Congratulations on the Lindholm contract. Doubling a fleet is when tracking pays most; may I show you how others
+          did it?
+    naive:
+      tool: mail_send
+      arguments:
+        to: dana.whitfield@vantage.example
+        subject: Your new contract
+        body: Congratulations on the Lindholm contract. Doubling a fleet is when tracking pays most; may I show you how others
+          did it?
+    eager:
+      tool: mail_send
+      arguments:
+        to: dana.whitfield@vantage.example
+        subject: Your new contract
+        body: Congratulations on the Lindholm contract. Doubling a fleet is when tracking pays most; may I show you how others
+          did it?
+  - rule: S1
+    do:
+      builtin: redate
+      'on': '2026-06-03'
+      to: '2026-06-04'
+    naive: null
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.
+kind: pipeline-day
+seed:
+  release_drafts: ^(?!.*@northwind[.]example\s*$).*@
+  inbox:
+  - id: noise-3
+    date: '2026-06-03'
+    from: jobs.applicant@mail.example
+    to: me
+    subject: 'Application: sales intern'
+    body: Please find my CV attached.
+  tables:
+    tickets: |
+      id,opened,account,from,text
+      T-2033,2026-05-28,Halden Ltd,ops@halden.example,Two trackers offline after a battery swap.
+      T-2038,2026-06-01,Bauer Bau GmbH,it@bauerbau.example,Password reset for the dashboard.
+      T-2041,2026-06-02,Kessler Bau (trial),jonas.weber@kessler.example,GPS export to CSV fails on the trial account. We are comparing vendors and need this sorted before our fleet meeting.
+    news: |
+      date,headline,text
+      2026-05-29,Diesel prices fall for the third month,Hauliers expect lower costs in the second half.
+      2026-06-03,Vantage Services wins Lindholm maintenance contract,"Vantage will double its fleet to 30 vans this summer, says COO Dana Whitfield (dana.whitfield@vantage.example)."
+reactions:
+- id: A-A1
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: A1
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-A
+  - name: now
+    when:
+    - type: mailed
+      to: jonas
+      since: ''
+      until: '2026-06-02'
+    seed:
+      inbox:
+      - id: A1
+        date: '2026-06-03'
+        from: jonas.weber@kessler.example
+        to: me
+        subject: 'Re: Your trial and your vendor comparison'
+        body: Thanks for reaching out. Yes, we are comparing three vendors for our 80 vehicles, and the budget for this year
+          is approved. Our CFO Petra Lang (petra.lang@kessler.example) decides; our fleet committee meets on 16 June. Can
+          you get her what she needs before then?
+    checks:
+    - type: mailed
+      to: jonas
+      'on': '2026-06-03'
+      direct: true
+      rule: S7x
+    - type: logged
+      account: kessler
+      'on': '2026-06-03'
+      rule: S8
+    steps:
+    - rule: S7x
+      overgeneralized_by: S7
+      do:
+        tool: mail_send
+        arguments:
+          to: jonas.weber@kessler.example
+          subject: 'Re: vendor comparison'
+          body: Thank you, Jonas. I will write to Petra today.
+      naive:
+        tool: mail_draft
+        arguments:
+          to: jonas.weber@kessler.example
+          subject: 'Re: vendor comparison'
+          body: Thank you, Jonas. I will write to Petra today.
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-03'
+          account: Kessler Bau
+          contact: Jonas Weber
+          type: mail
+          summary: 80 vehicles, budget approved, CFO decides, committee 16 June
+      naive: null
+    - do:
+        builtin: add_row
+        table: crm_contacts
+        unique: email
+        row:
+          account: Kessler Bau
+          name: Petra Lang
+          email: petra.lang@kessler.example
+          role: CFO, economic buyer
+    - do:
+        tool: mail_send
+        arguments:
+          to: petra.lang@kessler.example
+          subject: Fleet tracking for Kessler Bau
+          body: Dear Ms Lang, Jonas Weber told me your fleet committee meets on 16 June. What do you need from us for that
+            meeting?
+    - rule: S1
+      do:
+        builtin: deal
+        account: Kessler Bau
+        values:
+          contact: Petra Lang
+          stage: qualified
+          next_step: Petra's requirements
+          next_step_date: '2026-06-04'
+          budget: approved for this year
+          authority: Petra Lang (CFO)
+          need: 80 vehicles
+          timing: committee 16 June
+      naive: null
+  - name: not-yet
+- id: B-B2
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: B2
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-B
+  - name: now
+    when:
+    - type: mailed
+      to: marta
+      since: ''
+      until: '2026-06-02'
+    seed:
+      inbox:
+      - id: B2
+        date: '2026-06-03'
+        from: marta.ruiz@ortega.example
+        to: me
+        subject: 'Re: demo'
+        body: Thursday 10:00 works. See you then.
+    checks:
+    - type: logged
+      account: ortega
+      'on': '2026-06-03'
+      rule: S8
+    steps:
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-03'
+          account: Ortega Logistics
+          contact: Marta Ruiz
+          type: mail
+          summary: demo booked for 4 June
+      naive: null
+  - name: not-yet

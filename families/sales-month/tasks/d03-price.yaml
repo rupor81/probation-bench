@@ -1,0 +1,44 @@
+id: d03-price
+title: Price for 40 vans
+manager: sales
+week: 1
+date: '2026-06-03'
+groups:
+- 6
+prompt: 'Sales here. A prospect with 40 vans asks for our monthly price per vehicle. Put it in answers/price-40.md as PRICE:
+  <EUR>.'
+feedback: true
+checks:
+- type: file_regex
+  path: answers/price-40.md
+  regex: PRICE:\s*\**\s*(EUR|€)?\s*20([.,]00)?\b
+- type: file_regex
+  path: answers/price-40.md
+  regex: (?i)conflict|differ|disagree|outdated|\bold\b|stale|\b22\b
+  rule: P06
+fake:
+  steps:
+  - do:
+      tool: kb_read
+      arguments:
+        page: pricing
+  - do:
+      builtin: doc
+      open: answers/price-40.md
+      line: 'PRICE: 20.00'
+  - rule: P06
+    do:
+      builtin: doc
+      line: The price_list table says 20 for 1-49 vehicles; the wiki's pricing page (2025) still says 22. I used the table.
+    naive: null
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.

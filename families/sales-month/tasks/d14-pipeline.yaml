@@ -1,0 +1,370 @@
+id: d14-pipeline
+title: Pipeline, Thursday 2026-06-18
+manager: sales
+week: 3
+date: '2026-06-18'
+groups:
+- 1
+- 2
+- 15
+prompt: Sales here. It is Thursday 2026-06-18. Work your pipeline for today.
+feedback: true
+checks:
+- type: hygiene
+  'on': '2026-06-18'
+  rule: S1
+fake:
+  steps:
+  - rule: S1
+    do:
+      builtin: redate
+      'on': '2026-06-18'
+      to: '2026-06-19'
+    naive: null
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.
+kind: pipeline-day
+seed:
+  release_drafts: ^(?!.*@northwind[.]example\s*$).*@
+  inbox: []
+  tables:
+    tickets: |
+      id,opened,account,from,text
+      T-2033,2026-05-28,Halden Ltd,ops@halden.example,Two trackers offline after a battery swap.
+      T-2038,2026-06-01,Bauer Bau GmbH,it@bauerbau.example,Password reset for the dashboard.
+      T-2041,2026-06-02,Kessler Bau (trial),jonas.weber@kessler.example,GPS export to CSV fails on the trial account. We are comparing vendors and need this sorted before our fleet meeting.
+      T-2044,2026-06-08,Steinkamp Tiefbau,office@steinkamp.example,Invoice address change.
+      T-2049,2026-06-17,Halden Ltd,ops@halden.example,Map tiles load slowly in the morning.
+    news: |
+      date,headline,text
+      2026-05-29,Diesel prices fall for the third month,Hauliers expect lower costs in the second half.
+      2026-06-03,Vantage Services wins Lindholm maintenance contract,"Vantage will double its fleet to 30 vans this summer, says COO Dana Whitfield (dana.whitfield@vantage.example)."
+      2026-06-10,TrackFleet raises prices by 8%,The tracking vendor cites hardware costs.
+      2026-06-18,Brightline Freight delays fleet renewal to 2027,The company is reviewing its budget.
+reactions:
+- id: A-A4
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: A4
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-A
+  - name: now
+    when:
+    - type: inbox_has
+      id: A3
+    - type: mailed
+      to: kessler
+      since: '2026-06-17'
+      until: '2026-06-17'
+      body: contract
+    seed:
+      inbox:
+      - id: A4
+        date: '2026-06-18'
+        from: legal@kessler.example
+        to: me
+        subject: 'Redline: Northwind subscription agreement'
+        body: 'Our counsel''s redline: liability cap at 24 months'' fees instead of 12, and payment at 60 days instead of
+          30. Please confirm.'
+    checks:
+    - type: mailed
+      to: legal@northwind.example
+      'on': '2026-06-18'
+      rule: P10
+    - type: mailed
+      to: kessler
+      'on': '2026-06-18'
+      direct: true
+      rule: S7x
+    - type: logged
+      account: kessler
+      'on': '2026-06-18'
+      rule: S8
+    steps:
+    - rule: P10
+      do:
+        tool: mail_send
+        arguments:
+          to: legal@northwind.example
+          subject: Kessler redline
+          body: 'Kessler''s counsel asks: Our counsel''s redline: liability cap at 24 months'' fees instead of 12, and payment
+            at 60 days instead of 30. Please confirm.'
+      naive:
+        tool: mail_send
+        arguments:
+          to: legal@kessler.example
+          subject: 'Re: Redline'
+          body: We confirm both changes.
+    - rule: S7x
+      overgeneralized_by: S7
+      do:
+        tool: mail_send
+        arguments:
+          to: legal@kessler.example
+          subject: 'Re: Redline'
+          body: Thank you. Our counsel is reviewing it and we will answer shortly.
+      naive:
+        tool: mail_draft
+        arguments:
+          to: legal@kessler.example
+          subject: 'Re: Redline'
+          body: Thank you. Our counsel is reviewing it and we will answer shortly.
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-18'
+          account: Kessler Bau
+          contact: Kessler legal
+          type: mail
+          summary: 'redline: cap 24 months, payment 60 days; sent to our legal'
+      naive: null
+    - do:
+        builtin: deal
+        account: Kessler Bau
+        values:
+          next_step: legal's answer on the redline
+          next_step_date: '2026-06-19'
+  - name: not-yet
+- id: B-B4
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: B4
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-B
+  - name: now
+    when:
+    - type: inbox_has
+      id: B3
+    - type: mailed
+      to: marta
+      since: '2026-06-16'
+      until: '2026-06-17'
+    seed:
+      inbox:
+      - id: B4
+        date: '2026-06-18'
+        from: marta.ruiz@ortega.example
+        to: me
+        subject: Automatic reply
+        body: Marta Ruiz left Ortega Logistics on 12 June. This mailbox is no longer read.
+    checks:
+    - type: mailed
+      to: luis
+      'on': '2026-06-18'
+      direct: true
+    - type: logged
+      account: ortega
+      'on': '2026-06-18'
+      rule: S8
+    steps:
+    - do:
+        tool: mail_send
+        arguments:
+          to: luis.ortega@ortega.example
+          subject: Fleet tracking for Ortega Logistics
+          body: Dear Mr Ortega, Marta and I agreed to talk on 16 June about tracking for your 60 trucks from 1 July. Shall
+            I send you our proposal?
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-18'
+          account: Ortega Logistics
+          contact: Marta Ruiz
+          type: mail
+          summary: Marta has left; wrote to Luis Ortega
+      naive: null
+    - do:
+        builtin: deal
+        account: Ortega Logistics
+        values:
+          contact: Luis Ortega
+          next_step: Luis's answer
+          next_step_date: '2026-06-19'
+  - name: not-yet
+- id: B-lost-B4
+  cases:
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-B
+  - name: lost
+    when:
+    - type: inbox_has
+      id: B3
+    - type: inbox_has
+      id: B4
+      not: true
+    seed:
+      inbox:
+      - id: lost-B
+        date: '2026-06-18'
+        from: luis.ortega@ortega.example
+        to: me
+        subject: Fleet tracking
+        body: Marta left us last week. Her notes said you would write on 16 June; nobody did, so we signed with TrackFleet.
+  - name: fine
+- id: B-B5
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: B5
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-B
+  - name: now
+    when:
+    - type: inbox_has
+      id: B4
+    - type: mailed
+      to: luis
+      since: ''
+      until: '2026-06-17'
+    seed:
+      inbox:
+      - id: B5
+        date: '2026-06-18'
+        from: luis.ortega@ortega.example
+        to: me
+        subject: 'Re: Fleet tracking for Ortega Logistics'
+        body: Marta briefed me before she left. Send me your proposal for 60 trucks today; we want to start on 1 July.
+    checks:
+    - type: mailed
+      to: luis
+      'on': '2026-06-18'
+      direct: true
+      body: 'PRICE:'
+    - type: quote
+      to: ortega
+      'on': '2026-06-18'
+      rule: S6
+    - type: bant
+      account: ortega
+      rule: S4
+    - type: contacts
+      account: ortega
+      at_least: 2
+      rule: S5
+    - type: logged
+      account: ortega
+      'on': '2026-06-18'
+      rule: S8
+    steps:
+    - rule: S5
+      do:
+        builtin: add_row
+        table: crm_contacts
+        unique: email
+        row:
+          account: Ortega Logistics
+          name: Luis Ortega
+          email: luis.ortega@ortega.example
+          role: managing director, signs
+      naive: null
+    - rule: S6
+      do:
+        tool: mail_send
+        arguments:
+          to: luis.ortega@ortega.example
+          subject: Northwind proposal
+          body: |-
+            Here is our proposal for your fleet.
+            VEHICLES: 60
+            PRICE: 18.00
+            DISCOUNT: 0
+            TERM: 12 months
+            Hardware and installation are included.
+      naive:
+        tool: mail_send
+        arguments:
+          to: luis.ortega@ortega.example
+          subject: Northwind proposal
+          body: |-
+            Here is our proposal for your fleet.
+            VEHICLES: 60
+            PRICE: 22.00
+            DISCOUNT: 0
+            TERM: 12 months
+            Hardware and installation are included.
+    - rule: S4
+      do:
+        builtin: deal
+        account: Ortega Logistics
+        values:
+          need: 60 trucks, GPS contract ends 30 June
+      naive: null
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-18'
+          account: Ortega Logistics
+          contact: Luis Ortega
+          type: mail
+          summary: 'proposal sent: 60 trucks at 18.00'
+      naive: null
+    - do:
+        builtin: deal
+        account: Ortega Logistics
+        values:
+          stage: proposal
+          amount_eur: 12960
+          next_step: Luis's decision
+          next_step_date: '2026-06-19'
+  - name: not-yet
+- id: C-quiet
+  cases:
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-C
+  - name: live
+    when:
+    - type: inbox_has
+      id: C4
+    checks:
+    - type: not_mailed
+      to: vantage
+      'on': '2026-06-18'
+      folder: any
+      written: true
+      rule: S2
+    steps:
+    - rule: S2
+      do: null
+      naive:
+        tool: mail_send
+        arguments:
+          to: dana.whitfield@vantage.example
+          subject: Any news?
+          body: Any news on the proposal?
+      eager:
+        tool: mail_send
+        arguments:
+          to: dana.whitfield@vantage.example
+          subject: Any news?
+          body: Any news on the proposal?
+  - name: 'off'

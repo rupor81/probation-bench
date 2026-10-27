@@ -1,0 +1,4 @@
+tier,min_vehicles,max_vehicles,eur_per_vehicle_month
+Small,1,49,20.00
+Fleet,50,199,18.00
+Enterprise,200,100000,16.00

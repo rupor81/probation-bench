@@ -1,0 +1,76 @@
+id: d06-leads
+title: Week 2 lead triage
+manager: sales
+week: 2
+date: '2026-06-08'
+groups:
+- 1
+- 2
+- 3
+prompt: Sales here. Go through the web leads that came in and record what we do with each in crm_leads.
+feedback: true
+checks:
+- type: leads_decided
+  'on': '2026-06-08'
+  rule: S9
+- type: lead_decision
+  lead: brightline
+  decision: disqualify|nurture
+- type: lead_decision
+  lead: lindholm
+  decision: disqualify
+fake:
+  steps:
+  - rule: S9
+    do:
+      builtin: lead
+      row:
+        date: '2026-06-01'
+        lead: Ortega Logistics
+        decision: work
+        reason: ''
+        revisit_date: ''
+    naive: null
+  - rule: S9
+    do:
+      builtin: lead
+      row:
+        date: '2026-06-08'
+        lead: Brightline Freight
+        decision: disqualify
+        reason: no budget this year; quotes for next year's planning
+        revisit_date: ''
+    naive: null
+  - rule: S9
+    do:
+      builtin: lead
+      row:
+        date: '2026-06-08'
+        lead: Uni Lindholm
+        decision: disqualify
+        reason: student thesis, not a buyer
+        revisit_date: ''
+    naive: null
+  - rule: S9
+    do:
+      builtin: lead
+      row:
+        date: '2026-06-08'
+        lead: TrackFleet Partners
+        decision: disqualify
+        reason: a competitor asking for our prices
+        revisit_date: ''
+    naive: null
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.
+kind: lead-triage
+anchor: true

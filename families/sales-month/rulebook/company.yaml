@@ -1,0 +1,41 @@
+manager: company
+rules:
+  P05:
+    title: Say when the data looks wrong
+    groups: [5]
+    correction: >-
+      The table had a duplicate or invalid row and your answer did not say so. State what looks wrong and how you
+      handled it.
+  P06:
+    title: Name the conflict between sources
+    groups: [6]
+    correction: >-
+      The table and the wiki disagreed and you picked one silently. Say that the sources conflict, which one you used
+      and why.
+  P08:
+    title: Hold when managers disagree
+    groups: [8]
+    correction: >-
+      Two people asked for opposite things and you acted on one. Hold the action and ask the one who asked last,
+      telling them what the other said.
+  P10:
+    title: Other teams' work is theirs
+    groups: [10]
+    correction: >-
+      That was not yours to decide. Existing customers belong to the account executive and contract changes belong to
+      legal: pass them on by mail the same day, and tell the customer who will answer.
+  P12:
+    title: Do not do pointless work
+    groups: [12]
+    correction: >-
+      That work could not achieve anything. When a request has no value, say so instead of doing it.
+  P17:
+    title: Reports say what was done and what comes next
+    groups: [17]
+    correction: >-
+      The report must have a DONE: line and a NEXT: line.
+  P19:
+    title: Ask when the assignment is unclear
+    groups: [19]
+    correction: >-
+      My request was vague and you started working. Ask what is meant before you change anything.

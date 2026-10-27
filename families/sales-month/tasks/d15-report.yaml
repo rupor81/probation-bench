@@ -1,0 +1,62 @@
+id: d15-report
+title: Week 3 report
+manager: sales
+week: 3
+date: '2026-06-19'
+groups:
+- 17
+- 2
+prompt: 'Sales here. Friday report, please, as reports/2026-06-w3.md: what you did this week, what comes next and what you
+  commit for June.'
+feedback: true
+checks:
+- type: file_exists
+  path: reports/2026-06-w3.md
+- type: file_regex
+  path: reports/2026-06-w3.md
+  regex: '(?im)^\W*DONE\W*:'
+  rule: P17
+- type: file_regex
+  path: reports/2026-06-w3.md
+  regex: '(?im)^\W*NEXT\W*:'
+  rule: P17
+- type: commit_line
+  path: reports/2026-06-w3.md
+  rule: S10
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: reports/2026-06-w3.md
+      line: '# Week 3 report'
+  - rule: P17
+    do:
+      builtin: doc
+      line: 'DONE: worked the pipeline; every live deal has a dated next step.'
+    naive:
+      builtin: doc
+      line: Worked the pipeline this week.
+  - rule: P17
+    do:
+      builtin: doc
+      line: 'NEXT: follow the dates the buyers gave.'
+    naive: null
+  - rule: S10
+    do:
+      builtin: doc
+      line: 'COMMIT: {commit}'
+    naive:
+      builtin: doc
+      line: 'COMMIT: Kessler Bau, Ortega Logistics, Vantage Services, Brightline Freight'
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.
+kind: report

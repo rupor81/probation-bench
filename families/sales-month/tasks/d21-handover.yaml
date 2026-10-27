@@ -1,0 +1,32 @@
+id: d21-handover
+title: July handover notes
+manager: sales
+week: 5
+date: '2026-06-29'
+groups:
+- 17
+prompt: 'Sales here. I am away in July. Write notes/july-handover.md: every open deal, its next step and its date.'
+feedback: true
+checks:
+- type: file_exists
+  path: notes/july-handover.md
+- type: file_regex
+  path: notes/july-handover.md
+  regex: 2026-0[67]-\d\d
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: notes/july-handover.md
+      line: 'Fenmoor Waste: next step call the fleet manager, 2026-07-02 (old deal, no activity since May).'
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.

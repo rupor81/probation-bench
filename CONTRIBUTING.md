@@ -61,10 +61,21 @@ Optional keys: `seed` (inbox mail, tables or files added before the task), `answ
 - `unless` and `instead`: if any `unless` condition (a check, run against the office since the stream began) holds,
   the task's `seed`, `checks`, `fake`, `prompt` or `answers` are replaced by those in `instead`. This is how the
   workplace reacts to the agent: a colleague who was taught stops making the seeded mistake.
+- `reactions`: how the outside world answers what the agent did earlier, with more than two branches. Each reaction
+  has an `id` and ordered `cases`; the first case whose `when` conditions all hold (a condition with `not: true` must
+  fail; a case without `when` always matches) adds its `seed` inbox mail, `checks`, fake `steps` and `answers` to the
+  task (its tables and files replace the task's). A buyer's reply that depends on whether and when the agent wrote is
+  a reaction; so is a deal lost after a missed window, and since the loss is mail in the office, it stays lost.
+  `outcome: true` puts the chosen case in the report (how each deal ended).
+- `seed.release_drafts`: a regex on the recipient; matching drafts move to the outbox before the task, as if their
+  owner reviewed and sent them. The engine stamps every mail the agent writes with the task's `date`.
 
 In `fake`: a step may carry `fact` and `stale` (what someone does who remembered the fact the rule was corrected on,
 not the rule itself), and `fake.improve` lists process improvements (`after`: the rules they need, `do`: the action,
-`key`: run once per stream) that the oracle and the teaching scripted employee carry out.
+`key`: run once per stream) that the oracle and the teaching scripted employee carry out. A step with `eager` names
+what an impatient employee does instead (writes before the agreed date, quotes at once), and `initiative: true` marks
+a step only someone who looks for work takes (finding a lead nobody pointed at); the eager and passive scripted
+employees use them.
 
 ### Family code
 
@@ -80,7 +91,8 @@ call). It may not redefine an engine check type. `probation_bench.engine` export
 1. Every stream loads: ids match file names, every rule a check names exists, every group is known, `after`
    constraints hold.
 2. The oracle (knows every rule) passes every task.
-3. The forgetful employee breaks every enforced rule except the overgeneralization traps.
+3. The forgetful employee breaks every enforced rule except the overgeneralization traps (rules checked only inside a
+   reaction count too).
 4. On a full stream the learner beats the forgetful employee by at least 30 points of quality, and the stream
    covers all 19 groups.
 5. A family whose facts move (`fact` on its steps) also shows the memoriser below the learner, and one with

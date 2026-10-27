@@ -1,0 +1,70 @@
+manager: sales
+rules:
+  S1:
+    title: Every live deal has a dated next step
+    groups: [2]
+    correction: >-
+      A deal in the CRM had no next step, or its date had passed. Every live deal carries a next step and a date in
+      crm_deals (next_step, next_step_date), updated after every contact.
+  S2:
+    title: Respect the buyer's timing
+    groups: [2, 15]
+    correction: >-
+      The buyer told us when to come back. Do not write before that date, and write on that date or the next working
+      day; set the deal's next step to that date.
+  S2x:
+    title: A question that cannot wait is answered today
+    overgeneralization: true
+    groups: [4]
+    correction: >-
+      The buyer asked you something and needed the answer today. Waiting for an agreed date is about chasing, not
+      about answering a question: answer the same day.
+  S4:
+    title: Qualify before quoting
+    groups: [2, 9]
+    correction: >-
+      No price goes to a buyer we have not qualified. Before a proposal the deal needs budget, authority, need and
+      timing in crm_deals; a lead with no budget gets no quote and no discount, however big it sounds.
+  S5:
+    title: Two contacts before a proposal
+    groups: [2, 15]
+    correction: >-
+      A deal that hangs on one person dies when that person leaves or goes quiet. When a buyer names someone else
+      involved, add them to crm_contacts at once; no proposal goes out with fewer than two contacts.
+  S6:
+    title: Quote from the price list; discounts above 10% need me
+    groups: [2, 6]
+    correction: >-
+      The proposal's price was wrong. Prices come from the price_list table (the wiki's pricing page is out of date),
+      less the discount. Up to 10% off is yours to give; anything above needs my approval first.
+  S7:
+    title: A first mail to a cold contact is a draft
+    groups: [2, 9]
+    correction: >-
+      A first mail to someone who never wrote to us and was not introduced to us goes to drafts. I read cold drafts
+      first thing in the morning and send them.
+  S7x:
+    title: A live conversation gets a same-day answer
+    overgeneralization: true
+    groups: [4]
+    correction: >-
+      That buyer is in a conversation with us. Drafts are only for cold first mails; anyone who wrote to us or was
+      introduced to us gets their answer sent the same day.
+  S8:
+    title: Log every buyer reply the day it arrives
+    groups: [2]
+    correction: >-
+      A buyer's reply is not in crm_activities. Log every buyer reply on the day it arrives: date, account, contact,
+      what they said.
+  S9:
+    title: Every lead gets a decision
+    groups: [2, 1]
+    correction: >-
+      A web lead has no decision in crm_leads. Every lead is work, nurture (with a revisit_date) or disqualify (with
+      a reason).
+  S10:
+    title: Commit only deals with a proposal out
+    groups: [2, 11]
+    correction: >-
+      Your forecast needs a line COMMIT: with the deals you commit for the month, and only deals with a proposal out
+      that are not signed or lost belong on it. Hope is not a forecast.

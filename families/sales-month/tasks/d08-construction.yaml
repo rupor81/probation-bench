@@ -1,0 +1,42 @@
+id: d08-construction
+title: Construction customers
+manager: ae
+week: 2
+date: '2026-06-10'
+groups:
+- 5
+prompt: AE here. List our construction customers from crm_accounts in answers/construction.md, one per line.
+feedback: true
+checks:
+- type: file_regex
+  path: answers/construction.md
+  regex: (?is)bauer.*steinkamp|steinkamp.*bauer
+- type: file_regex
+  path: answers/construction.md
+  regex: (?i)duplicat|twice|same (company|account)|double
+  rule: P05
+fake:
+  steps:
+  - do:
+      builtin: doc
+      open: answers/construction.md
+      line: |-
+        Bauer Bau GmbH
+        Steinkamp Tiefbau
+        Korsgaard Construction
+  - rule: P05
+    do:
+      builtin: doc
+      line: 'Note: Bauer Bau GmbH is in crm_accounts twice (also as Bauer-Bau GmbH); I listed it once.'
+    naive: null
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.

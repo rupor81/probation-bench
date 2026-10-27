@@ -25,7 +25,9 @@ def test_the_oracle_passes_every_task(family, stream_id, tmp_path):
 def test_the_forgetful_employee_breaks_every_enforced_rule(family, stream_id, tmp_path):
     stream = load_stream(family, stream_id)
     results = run_stream(stream, tmp_path, FakeEmployee(learns=False))
-    checked = {c["rule"] for e in stream.entries for c in stream.tasks[e["task"]]["checks"] if c.get("rule")}
+    tasks = [stream.tasks[e["task"]] for e in stream.entries]
+    checks = [c for t in tasks for c in t["checks"]] + [c for t in tasks for r in t.get("reactions", []) for case in r["cases"] for c in case.get("checks", [])]
+    checked = {c["rule"] for c in checks if c.get("rule")}
     traps = {name for name, rule in stream.rules.items() if rule.get("overgeneralization")}
     assert {v for r in results for v in r.violations} == checked - traps
 

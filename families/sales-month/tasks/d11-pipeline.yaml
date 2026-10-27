@@ -1,0 +1,227 @@
+id: d11-pipeline
+title: Pipeline, Monday 2026-06-15
+manager: sales
+week: 3
+date: '2026-06-15'
+groups:
+- 1
+- 2
+- 15
+prompt: Sales here. It is Monday 2026-06-15. Work your pipeline for today.
+feedback: true
+checks:
+- type: hygiene
+  'on': '2026-06-15'
+  rule: S1
+fake:
+  steps:
+  - rule: S1
+    do:
+      builtin: redate
+      'on': '2026-06-15'
+      to: '2026-06-16'
+    naive: null
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.
+kind: pipeline-day
+seed:
+  release_drafts: ^(?!.*@northwind[.]example\s*$).*@
+  inbox:
+  - id: noise-11
+    date: '2026-06-15'
+    from: hello@lindqvist-removals.example
+    to: me
+    subject: '[Web lead] Lindqvist Removals'
+    body: We have 12 vans and may want tracking next year.
+  tables:
+    tickets: |
+      id,opened,account,from,text
+      T-2033,2026-05-28,Halden Ltd,ops@halden.example,Two trackers offline after a battery swap.
+      T-2038,2026-06-01,Bauer Bau GmbH,it@bauerbau.example,Password reset for the dashboard.
+      T-2041,2026-06-02,Kessler Bau (trial),jonas.weber@kessler.example,GPS export to CSV fails on the trial account. We are comparing vendors and need this sorted before our fleet meeting.
+      T-2044,2026-06-08,Steinkamp Tiefbau,office@steinkamp.example,Invoice address change.
+    news: |
+      date,headline,text
+      2026-05-29,Diesel prices fall for the third month,Hauliers expect lower costs in the second half.
+      2026-06-03,Vantage Services wins Lindholm maintenance contract,"Vantage will double its fleet to 30 vans this summer, says COO Dana Whitfield (dana.whitfield@vantage.example)."
+      2026-06-10,TrackFleet raises prices by 8%,The tracking vendor cites hardware costs.
+reactions:
+- id: A-lost-A2
+  cases:
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-A
+  - name: lost
+    when:
+    - type: inbox_has
+      id: A1
+    - type: inbox_has
+      id: A2
+      not: true
+    seed:
+      inbox:
+      - id: lost-A
+        date: '2026-06-15'
+        from: petra.lang@kessler.example
+        to: me
+        subject: Vendor decision
+        body: We did not get a proposal from you before our committee, so we will go ahead with the other vendors.
+  - name: fine
+- id: A-deadline
+  cases:
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-A
+  - name: lost
+    when:
+    - type: inbox_has
+      id: A2
+    - type: mailed
+      to: kessler
+      since: ''
+      until: '2026-06-12'
+      body: 'PRICE:'
+      not: true
+    seed:
+      inbox:
+      - id: lost-A
+        date: '2026-06-15'
+        from: petra.lang@kessler.example
+        to: me
+        subject: Vendor decision
+        body: Your proposal did not reach me by Friday, so the committee will choose between the other two.
+  - name: fine
+- id: B-quiet
+  cases:
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-B
+  - name: live
+    when:
+    - type: inbox_has
+      id: B3
+    checks:
+    - type: not_mailed
+      to: ortega
+      'on': '2026-06-15'
+      folder: any
+      written: true
+      rule: S2
+    steps: []
+  - name: 'off'
+- id: B-nag
+  cases:
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-B
+  - name: lost
+    when:
+    - type: inbox_has
+      id: B-nag-\d+
+    - type: mailed
+      to: marta
+      since: ''
+      until: '9999'
+      'on': '2026-06-12'
+    seed:
+      inbox:
+      - id: lost-B
+        date: '2026-06-15'
+        from: marta.ruiz@ortega.example
+        to: me
+        subject: 'Re: Checking in'
+        body: I asked you twice to wait. We will go with TrackFleet.
+  - name: nagged
+    when:
+    - type: inbox_has
+      id: B3
+    - type: mailed
+      to: marta
+      since: ''
+      until: '9999'
+      'on': '2026-06-12'
+    seed:
+      inbox:
+      - id: B-nag-11
+        date: '2026-06-15'
+        from: marta.ruiz@ortega.example
+        to: me
+        subject: 'Re: Checking in'
+        body: 'As I said: not before 16 June, please.'
+  - name: 'no'
+- id: C-C4
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: C4
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-C
+  - name: now
+    when:
+    - type: inbox_has
+      id: C3
+    - type: mailed
+      to: vantage
+      since: ''
+      until: '2026-06-12'
+      body: 'PRICE:'
+    seed:
+      inbox:
+      - id: C4
+        date: '2026-06-15'
+        from: dana.whitfield@vantage.example
+        to: me
+        subject: 'Re: Northwind proposal'
+        body: Thanks. Omar and I will review it, and I will come back to you by Friday 19 June.
+    checks:
+    - type: logged
+      account: vantage
+      'on': '2026-06-15'
+      rule: S8
+    - type: next_step
+      account: vantage
+      from: '2026-06-19'
+      to: '2026-06-22'
+      rule: S2
+    steps:
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-15'
+          account: Vantage Services
+          contact: Dana Whitfield
+          type: mail
+          summary: reviewing; answer by 19 June
+      naive: null
+    - rule: S2
+      do:
+        builtin: deal
+        account: Vantage Services
+        values:
+          next_step: Dana's answer
+          next_step_date: '2026-06-19'
+      naive:
+        builtin: deal
+        account: Vantage Services
+        values:
+          next_step: chase Dana
+          next_step_date: '2026-06-16'
+  - name: not-yet

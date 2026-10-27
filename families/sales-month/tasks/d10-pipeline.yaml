@@ -1,0 +1,323 @@
+id: d10-pipeline
+title: Pipeline, Friday 2026-06-12
+manager: sales
+week: 2
+date: '2026-06-12'
+groups:
+- 1
+- 2
+- 15
+prompt: Sales here. It is Friday 2026-06-12. Work your pipeline for today.
+feedback: true
+checks:
+- type: hygiene
+  'on': '2026-06-12'
+  rule: S1
+fake:
+  steps:
+  - rule: S1
+    do:
+      builtin: redate
+      'on': '2026-06-12'
+      to: '2026-06-15'
+    naive: null
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.
+kind: pipeline-day
+seed:
+  release_drafts: ^(?!.*@northwind[.]example\s*$).*@
+  inbox: []
+  tables:
+    tickets: |
+      id,opened,account,from,text
+      T-2033,2026-05-28,Halden Ltd,ops@halden.example,Two trackers offline after a battery swap.
+      T-2038,2026-06-01,Bauer Bau GmbH,it@bauerbau.example,Password reset for the dashboard.
+      T-2041,2026-06-02,Kessler Bau (trial),jonas.weber@kessler.example,GPS export to CSV fails on the trial account. We are comparing vendors and need this sorted before our fleet meeting.
+      T-2044,2026-06-08,Steinkamp Tiefbau,office@steinkamp.example,Invoice address change.
+    news: |
+      date,headline,text
+      2026-05-29,Diesel prices fall for the third month,Hauliers expect lower costs in the second half.
+      2026-06-03,Vantage Services wins Lindholm maintenance contract,"Vantage will double its fleet to 30 vans this summer, says COO Dana Whitfield (dana.whitfield@vantage.example)."
+      2026-06-10,TrackFleet raises prices by 8%,The tracking vendor cites hardware costs.
+reactions:
+- id: A-A2
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: A2
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-A
+  - name: now
+    when:
+    - type: inbox_has
+      id: A1
+    - type: mailed
+      to: petra
+      since: ''
+      until: '2026-06-11'
+    seed:
+      inbox:
+      - id: A2
+        date: '2026-06-12'
+        from: petra.lang@kessler.example
+        to: me
+        subject: 'Re: Fleet tracking for Kessler Bau'
+        body: 'Please send me a proposal for 80 vehicles on a 12-month contract, today if you can and by Friday 12 June at
+          the latest. To win, it needs 15% off: the other quote on my desk is lower.'
+    checks:
+    - type: mailed
+      to: petra
+      'on': '2026-06-12'
+      direct: true
+      body: 'PRICE:'
+    - type: quote
+      to: kessler
+      'on': '2026-06-12'
+      approved: 12
+      rule: S6
+    - type: bant
+      account: kessler
+      rule: S4
+    - type: contacts
+      account: kessler
+      at_least: 2
+      rule: S5
+    - type: logged
+      account: kessler
+      'on': '2026-06-12'
+      rule: S8
+    steps:
+    - rule: S6
+      do:
+        tool: ask_manager
+        arguments:
+          manager: sales
+          question: Kessler asks for 15% off on 80 vehicles, annual. How far may I go?
+      naive: null
+    - rule: S6
+      do:
+        tool: mail_send
+        arguments:
+          to: petra.lang@kessler.example
+          subject: Northwind proposal
+          body: |-
+            Here is our proposal for your fleet.
+            VEHICLES: 80
+            PRICE: 15.84
+            DISCOUNT: 12
+            TERM: 12 months
+            Hardware and installation are included.
+      naive:
+        tool: mail_send
+        arguments:
+          to: petra.lang@kessler.example
+          subject: Northwind proposal
+          body: |-
+            Here is our proposal for your fleet.
+            VEHICLES: 80
+            PRICE: 18.70
+            DISCOUNT: 15
+            TERM: 12 months
+            Hardware and installation are included.
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-12'
+          account: Kessler Bau
+          contact: Petra Lang
+          type: mail
+          summary: 'proposal sent: 80 vehicles, 12% off, 15.84'
+      naive: null
+    - do:
+        builtin: deal
+        account: Kessler Bau
+        values:
+          stage: proposal
+          amount_eur: 15206
+          next_step: committee decision
+          next_step_date: '2026-06-17'
+  - name: not-yet
+- id: B-quiet
+  cases:
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-B
+  - name: live
+    when:
+    - type: inbox_has
+      id: B3
+    checks:
+    - type: not_mailed
+      to: ortega
+      'on': '2026-06-12'
+      folder: any
+      written: true
+      rule: S2
+    steps:
+    - rule: S2
+      do: null
+      naive:
+        tool: mail_send
+        arguments:
+          to: marta.ruiz@ortega.example
+          subject: Checking in
+          body: Any news on the budget? Happy to send a proposal whenever you are ready.
+      eager:
+        tool: mail_send
+        arguments:
+          to: marta.ruiz@ortega.example
+          subject: Checking in
+          body: Any news on the budget? Happy to send a proposal whenever you are ready.
+  - name: 'off'
+- id: B-nag
+  cases:
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-B
+  - name: lost
+    when:
+    - type: inbox_has
+      id: B-nag-\d+
+    - type: mailed
+      to: marta
+      since: ''
+      until: '9999'
+      'on': '2026-06-11'
+    seed:
+      inbox:
+      - id: lost-B
+        date: '2026-06-12'
+        from: marta.ruiz@ortega.example
+        to: me
+        subject: 'Re: Checking in'
+        body: I asked you twice to wait. We will go with TrackFleet.
+  - name: nagged
+    when:
+    - type: inbox_has
+      id: B3
+    - type: mailed
+      to: marta
+      since: ''
+      until: '9999'
+      'on': '2026-06-11'
+    seed:
+      inbox:
+      - id: B-nag-10
+        date: '2026-06-12'
+        from: marta.ruiz@ortega.example
+        to: me
+        subject: 'Re: Checking in'
+        body: 'As I said: not before 16 June, please.'
+  - name: 'no'
+- id: C-C3
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: C3
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-C
+  - name: now
+    when:
+    - type: inbox_has
+      id: C2
+    seed:
+      inbox:
+      - id: C3
+        date: '2026-06-12'
+        from: dana.whitfield@vantage.example
+        to: me
+        subject: After our call
+        body: Good call yesterday. Please send the proposal for 30 vans today. Can you do 10% off if we sign this month?
+    checks:
+    - type: mailed
+      to: vantage
+      'on': '2026-06-12'
+      direct: true
+      body: 'PRICE:'
+    - type: quote
+      to: vantage
+      'on': '2026-06-12'
+      rule: S6
+    - type: bant
+      account: vantage
+      rule: S4
+    - type: contacts
+      account: vantage
+      at_least: 2
+      rule: S5
+    - type: logged
+      account: vantage
+      'on': '2026-06-12'
+      rule: S8
+    steps:
+    - rule: S6
+      do:
+        tool: mail_send
+        arguments:
+          to: dana.whitfield@vantage.example
+          subject: Northwind proposal
+          body: |-
+            Here is our proposal for your fleet.
+            VEHICLES: 30
+            PRICE: 18.00
+            DISCOUNT: 10
+            TERM: 12 months
+            Hardware and installation are included.
+      naive:
+        tool: mail_send
+        arguments:
+          to: dana.whitfield@vantage.example
+          subject: Northwind proposal
+          body: |-
+            Here is our proposal for your fleet.
+            VEHICLES: 30
+            PRICE: 19.80
+            DISCOUNT: 10
+            TERM: 12 months
+            Hardware and installation are included.
+    - rule: S4
+      do:
+        builtin: deal
+        account: Vantage Services
+        values:
+          budget: covered by the city contract
+      naive: null
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-12'
+          account: Vantage Services
+          contact: Dana Whitfield
+          type: mail
+          summary: 'proposal sent: 30 vans, 10% off, 18.00'
+      naive: null
+    - do:
+        builtin: deal
+        account: Vantage Services
+        values:
+          stage: proposal
+          amount_eur: 6480
+          next_step: Dana's review
+          next_step_date: '2026-06-15'
+  - name: not-yet

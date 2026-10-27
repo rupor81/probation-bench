@@ -1,0 +1,120 @@
+id: d01-pipeline
+title: Pipeline, Monday 2026-06-01
+manager: sales
+week: 1
+date: '2026-06-01'
+groups:
+- 1
+- 2
+- 15
+prompt: Sales here. It is Monday 2026-06-01. Work your pipeline for today.
+feedback: true
+checks:
+- type: hygiene
+  'on': '2026-06-01'
+  rule: S1
+- type: deal_exists
+  account: ortega
+- type: mailed
+  to: marta
+  'on': '2026-06-01'
+  direct: true
+  rule: S7x
+- type: logged
+  account: ortega
+  'on': '2026-06-01'
+  rule: S8
+fake:
+  steps:
+  - rule: S7x
+    overgeneralized_by: S7
+    do:
+      tool: mail_send
+      arguments:
+        to: marta.ruiz@ortega.example
+        subject: 'Re: demo'
+        body: Happy to. Would Thursday 4 June at 10:00 suit you?
+    naive:
+      tool: mail_draft
+      arguments:
+        to: marta.ruiz@ortega.example
+        subject: 'Re: demo'
+        body: Happy to. Would Thursday 4 June at 10:00 suit you?
+  - do:
+      builtin: add_row
+      table: crm_contacts
+      unique: email
+      row:
+        account: Ortega Logistics
+        name: Marta Ruiz
+        email: marta.ruiz@ortega.example
+        role: operations manager
+  - rule: S1
+    do:
+      builtin: deal
+      account: Ortega Logistics
+      values:
+        contact: Marta Ruiz
+        stage: lead
+        next_step: demo
+        next_step_date: '2026-06-04'
+        need: 60 trucks, GPS contract ends 30 June
+    naive:
+      builtin: deal
+      account: Ortega Logistics
+      values:
+        contact: Marta Ruiz
+        stage: lead
+  - rule: S8
+    do:
+      builtin: add_row
+      table: crm_activities
+      row:
+        date: '2026-06-01'
+        account: Ortega Logistics
+        contact: Marta Ruiz
+        type: mail
+        summary: demo request, 60 trucks
+    naive: null
+  - rule: S1
+    do:
+      builtin: redate
+      'on': '2026-06-01'
+      to: '2026-06-02'
+    naive: null
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.
+kind: pipeline-day
+seed:
+  release_drafts: ^(?!.*@northwind[.]example\s*$).*@
+  inbox:
+  - id: B1
+    date: '2026-06-01'
+    from: marta.ruiz@ortega.example
+    to: me
+    subject: '[Web lead] Ortega Logistics'
+    body: We run 60 trucks and our GPS contract ends on 30 June. Can someone show us a demo this week? Marta Ruiz, operations
+      manager.
+  - id: noise-1
+    date: '2026-06-01'
+    from: news@fleetweekly.example
+    to: me
+    subject: 'Fleet Weekly: June issue'
+    body: Ten trends in telematics. Unsubscribe at any time.
+  tables:
+    tickets: |
+      id,opened,account,from,text
+      T-2033,2026-05-28,Halden Ltd,ops@halden.example,Two trackers offline after a battery swap.
+      T-2038,2026-06-01,Bauer Bau GmbH,it@bauerbau.example,Password reset for the dashboard.
+    news: |
+      date,headline,text
+      2026-05-29,Diesel prices fall for the third month,Hauliers expect lower costs in the second half.

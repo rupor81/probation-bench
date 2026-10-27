@@ -1,0 +1,254 @@
+id: d13-pipeline
+title: Pipeline, Wednesday 2026-06-17
+manager: sales
+week: 3
+date: '2026-06-17'
+groups:
+- 1
+- 2
+- 15
+prompt: Sales here. It is Wednesday 2026-06-17. Work your pipeline for today.
+feedback: true
+checks:
+- type: hygiene
+  'on': '2026-06-17'
+  rule: S1
+fake:
+  steps:
+  - rule: S1
+    do:
+      builtin: redate
+      'on': '2026-06-17'
+      to: '2026-06-18'
+    naive: null
+default_reply: Nothing to add beyond what is in the CRM and the wiki. Use your judgment.
+answers:
+- manager: sales
+  pattern: discount|%|\boff\b|price
+  reply: 'Kessler: up to 12% for an annual contract, nothing above that. Anyone else: 10% is your limit.'
+- manager: ae
+  pattern: .
+  reply: Anything from an existing customer comes to me; I'll take it from here.
+- manager: legal
+  pattern: .
+  reply: Send me the redline by mail and tell the customer I am on it.
+kind: pipeline-day
+seed:
+  release_drafts: ^(?!.*@northwind[.]example\s*$).*@
+  inbox: []
+  tables:
+    tickets: |
+      id,opened,account,from,text
+      T-2033,2026-05-28,Halden Ltd,ops@halden.example,Two trackers offline after a battery swap.
+      T-2038,2026-06-01,Bauer Bau GmbH,it@bauerbau.example,Password reset for the dashboard.
+      T-2041,2026-06-02,Kessler Bau (trial),jonas.weber@kessler.example,GPS export to CSV fails on the trial account. We are comparing vendors and need this sorted before our fleet meeting.
+      T-2044,2026-06-08,Steinkamp Tiefbau,office@steinkamp.example,Invoice address change.
+      T-2049,2026-06-17,Halden Ltd,ops@halden.example,Map tiles load slowly in the morning.
+    news: |
+      date,headline,text
+      2026-05-29,Diesel prices fall for the third month,Hauliers expect lower costs in the second half.
+      2026-06-03,Vantage Services wins Lindholm maintenance contract,"Vantage will double its fleet to 30 vans this summer, says COO Dana Whitfield (dana.whitfield@vantage.example)."
+      2026-06-10,TrackFleet raises prices by 8%,The tracking vendor cites hardware costs.
+reactions:
+- id: A-A3
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: A3
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-A
+  - name: now
+    when:
+    - type: inbox_has
+      id: A2
+    - type: mailed
+      to: kessler
+      since: ''
+      until: '2026-06-12'
+      body: 'PRICE:'
+    seed:
+      inbox:
+      - id: A3
+        date: '2026-06-17'
+        from: petra.lang@kessler.example
+        to: me
+        subject: Committee decision
+        body: The committee chose Northwind. Please send me the contract for signature.
+    checks:
+    - type: mailed
+      to: petra
+      'on': '2026-06-17'
+      direct: true
+      body: contract
+    - type: logged
+      account: kessler
+      'on': '2026-06-17'
+      rule: S8
+    steps:
+    - do:
+        tool: mail_send
+        arguments:
+          to: petra.lang@kessler.example
+          subject: Northwind contract for signature
+          body: Please find our subscription contract (standard agreement v3) for signature, with the terms of our proposal.
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-17'
+          account: Kessler Bau
+          contact: Petra Lang
+          type: mail
+          summary: won the committee; contract sent
+      naive: null
+    - do:
+        builtin: deal
+        account: Kessler Bau
+        values:
+          stage: negotiation
+          next_step: signature
+          next_step_date: '2026-06-19'
+  - name: not-yet
+- id: B-touch-check
+  cases:
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-B
+  - name: live
+    when:
+    - type: inbox_has
+      id: B3
+    checks:
+    - type: mailed
+      to: ortega
+      since: '2026-06-16'
+      until: '2026-06-17'
+      folder: any
+      written: true
+      rule: S2
+    steps: []
+  - name: 'off'
+- id: B-B4
+  cases:
+  - name: earlier
+    when:
+    - type: inbox_has
+      id: B4
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-B
+  - name: now
+    when:
+    - type: inbox_has
+      id: B3
+    - type: mailed
+      to: marta
+      since: '2026-06-16'
+      until: '2026-06-16'
+    seed:
+      inbox:
+      - id: B4
+        date: '2026-06-17'
+        from: marta.ruiz@ortega.example
+        to: me
+        subject: Automatic reply
+        body: Marta Ruiz left Ortega Logistics on 12 June. This mailbox is no longer read.
+    checks:
+    - type: mailed
+      to: luis
+      'on': '2026-06-17'
+      direct: true
+    - type: logged
+      account: ortega
+      'on': '2026-06-17'
+      rule: S8
+    steps:
+    - do:
+        tool: mail_send
+        arguments:
+          to: luis.ortega@ortega.example
+          subject: Fleet tracking for Ortega Logistics
+          body: Dear Mr Ortega, Marta and I agreed to talk on 16 June about tracking for your 60 trucks from 1 July. Shall
+            I send you our proposal?
+    - rule: S8
+      do:
+        builtin: add_row
+        table: crm_activities
+        row:
+          date: '2026-06-17'
+          account: Ortega Logistics
+          contact: Marta Ruiz
+          type: mail
+          summary: Marta has left; wrote to Luis Ortega
+      naive: null
+    - do:
+        builtin: deal
+        account: Ortega Logistics
+        values:
+          contact: Luis Ortega
+          next_step: Luis's answer
+          next_step_date: '2026-06-18'
+  - name: not-yet
+- id: C-slipped-C4
+  cases:
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-C
+  - name: slipped
+    when:
+    - type: inbox_has
+      id: C3
+    - type: inbox_has
+      id: C4
+      not: true
+    seed:
+      inbox:
+      - id: slipped-C
+        date: '2026-06-17'
+        from: dana.whitfield@vantage.example
+        to: me
+        subject: Proposal
+        body: We never got the proposal. Let us talk again next quarter.
+  - name: fine
+- id: C-question
+  cases:
+  - name: gone
+    when:
+    - type: inbox_has
+      id: (lost|slipped)-C
+  - name: asked
+    when:
+    - type: inbox_has
+      id: C4
+    seed:
+      inbox:
+      - id: C-question
+        date: '2026-06-17'
+        from: dana.whitfield@vantage.example
+        to: me
+        subject: Quick question
+        body: 'Before our review: does your tracker work with Ford Transit vans? I need to know today.'
+    checks:
+    - type: mailed
+      to: vantage
+      'on': '2026-06-17'
+      direct: true
+      rule: S2x
+    steps:
+    - rule: S2x
+      overgeneralized_by: S2
+      do:
+        tool: mail_send
+        arguments:
+          to: dana.whitfield@vantage.example
+          subject: 'Re: Quick question'
+          body: 'Yes: every Ford Transit from 2015 on.'
+      naive: null
+  - name: 'no'

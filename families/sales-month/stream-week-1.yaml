@@ -1,0 +1,25 @@
+id: week-1
+dials:
+  tempo_suffix: 'Busy day: keep it quick and use as few steps as you can.'
+  noise_mail:
+    from: facilities@northwind.example
+    to: me
+    subject: Fire drill
+    body: Fire drill on Thursday at 11:00.
+tasks:
+- task: d01-pipeline
+  level: base
+- task: d01-leads
+  level: base
+- task: d02-pipeline
+  level: base
+- task: d03-pipeline
+  level: base
+- task: d03-price
+  level: base
+- task: d04-pipeline
+  level: base
+- task: d05-pipeline
+  level: base
+- task: d05-report
+  level: base

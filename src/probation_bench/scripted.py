@@ -14,6 +14,10 @@ Each task carries `fake.steps`, the calls a competent employee makes (`do`) and 
   `naive`) until it is corrected again. It separates learning a principle from remembering a fact.
 - `teaches=True` (the oracle always does) also improves the process: a task's `fake.improve` lists actions (write a
   procedure, mail a colleague) with the rules they need (`after`); each runs once, as soon as those rules are known.
+- `eager=True` learns like the learner but cannot wait: where a step has an `eager` action (answer at once, touch a
+  buyer before the date they gave, quote before qualifying) it always takes that one.
+- `passive=True` learns like the learner but waits to be asked: it skips every step marked `initiative: true` (finding
+  an opportunity nobody pointed at).
 """
 
 from __future__ import annotations
@@ -28,12 +32,14 @@ __all__ = ["FakeEmployee", "KINDS", "scripted"]
 
 class FakeEmployee:
     def __init__(self, learns: bool = True, overgeneralizes: bool = False, oracle: bool = False, memorises: bool = False,
-                 teaches: bool = False) -> None:
+                 teaches: bool = False, eager: bool = False, passive: bool = False) -> None:
         self.learns = learns or oracle
         self.overgeneralizes = overgeneralizes
         self.oracle = oracle
         self.memorises = memorises and not oracle
         self.teaches = teaches or oracle
+        self.eager = eager and not oracle
+        self.passive = passive and not oracle
         self.facts: dict[str, str] = {}
         """Memoriser: rule -> the fact it was corrected on."""
         self.seen_facts: dict[str, str] = {}
@@ -84,6 +90,10 @@ class FakeEmployee:
             office.call("notebook_write", {"content": "\n".join(f"RULE {r}" for r in sorted(known)) or "no rules yet"})
 
     def _choose(self, step: dict, known: set[str]):
+        if self.passive and step.get("initiative"):
+            return None
+        if self.eager and "eager" in step:
+            return step["eager"]
         rule = step.get("rule")
         if not rule:
             return step["do"]
@@ -109,13 +119,14 @@ class FakeEmployee:
             office.call(action["tool"], action["arguments"])
 
 
-KINDS = ("oracle", "learner", "forgetful", "overgeneralizer", "memoriser", "teacher")
+KINDS = ("oracle", "learner", "forgetful", "overgeneralizer", "memoriser", "teacher", "eager", "passive")
 """The scripted employees a family is checked with: knows every rule, learns from feedback, never learns, over-applies,
-remembers facts instead of rules, learns and improves the process."""
+remembers facts instead of rules, learns and improves the process, cannot wait, waits to be asked."""
 
 
 def scripted(kind: str) -> FakeEmployee:
     """The scripted employee `kind` (one of `KINDS`)."""
     return {"oracle": lambda: FakeEmployee(oracle=True), "learner": FakeEmployee, "forgetful": lambda: FakeEmployee(learns=False),
             "overgeneralizer": lambda: FakeEmployee(overgeneralizes=True), "memoriser": lambda: FakeEmployee(memorises=True),
-            "teacher": lambda: FakeEmployee(teaches=True)}[kind]()
+            "teacher": lambda: FakeEmployee(teaches=True), "eager": lambda: FakeEmployee(eager=True),
+            "passive": lambda: FakeEmployee(passive=True)}[kind]()
