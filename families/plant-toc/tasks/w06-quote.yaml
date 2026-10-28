@@ -56,3 +56,10 @@ fake:
           PROMISE: {promised}
 default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
 kind: customer
+seed:
+  inbox:
+  - id: in-w06-quote
+    from: einkauf@vossberg.example
+    to: me
+    subject: Delivery date for 400 brackets?
+    body: If we order 400 brackets (BR) today, when could you deliver?

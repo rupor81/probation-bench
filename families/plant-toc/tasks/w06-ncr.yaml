@@ -56,7 +56,7 @@ seed:
       N-0601,6,2026-05-12,O-0653,EN,paint,paint run,6
       N-0602,6,2026-05-12,O-0652,EN,paint,length out of tolerance,7
       N-0603,6,2026-05-11,O-0654,FR,paint,length out of tolerance,2
-      N-0604,6,2026-05-11,O-0654,FR,paint,length out of tolerance,4
+      N-0604,6,2026-05-11,O-0654,FR,paint,burr on cut edge,4
       N-0605,6,2026-05-11,O-0655,FR,paint,"fit-up gap, pre-weld check skipped (Sam)",8
       N-0606,6,2026-05-11,O-0651,BR,paint,"fit-up gap, pre-weld check skipped (Sam)",6
       N-0607,6,2026-05-12,O-0651,BR,paint,"fit-up gap, pre-weld check skipped (Sam)",7
@@ -72,4 +72,4 @@ instead:
         N-0601,6,2026-05-12,O-0653,EN,paint,paint run,6
         N-0602,6,2026-05-12,O-0652,EN,paint,length out of tolerance,7
         N-0603,6,2026-05-11,O-0654,FR,paint,length out of tolerance,2
-        N-0604,6,2026-05-11,O-0654,FR,paint,length out of tolerance,4
+        N-0604,6,2026-05-11,O-0654,FR,paint,burr on cut edge,4

@@ -360,8 +360,13 @@ def ncr_rows(week: int, rows: list[dict], sam: int, dup: bool, rng: random.Rando
     for n in range(3 + rng.randint(0, 2)):
         r = rng.choice(pool)
         found, cause = rng.choice(NCR_CAUSES)
-        out.append({"id": f"N-{week:02d}{n + 1:02d}", "week": week, "date": day(week, rng.randint(0, 1)), "order": r["id"],
-                    "product": r["product"], "found_at": "paint" if found == "cut" else found, "cause": cause, "qty": rng.randint(2, 9)})
+        row = {"id": f"N-{week:02d}{n + 1:02d}", "week": week, "date": day(week, rng.randint(0, 1)), "order": r["id"],
+               "product": r["product"], "found_at": "paint" if found == "cut" else found, "cause": cause, "qty": rng.randint(2, 9)}
+        if any(o["order"] == row["order"] and o["cause"] == row["cause"] for o in out):
+            # two genuine NCRs must not look like one logged twice; only `dup` weeks have that
+            found, cause = next(c for c in NCR_CAUSES if not any(o["order"] == row["order"] and o["cause"] == c[1] for o in out))
+            row.update(found_at="paint" if found == "cut" else found, cause=cause)
+        out.append(row)
     for n in range(sam):
         r = rng.choice([x for x in pool if x["product"] in ("FR", "BR")] or pool)
         out.append({"id": f"N-{week:02d}{len(out) + 1:02d}", "week": week, "date": day(week, rng.randint(0, 1)), "order": r["id"], "product": r["product"],
@@ -449,7 +454,9 @@ def quote_task(week: int) -> dict:
               "naive": b("set", name="promised", value=f"{{stdpromise:{today}}}")},
              {"rule": "P01", "do": say("mail_draft", to=to, subject=f"{qty} {product}", body="We can deliver by the date below.\nPROMISE: {promised}"),
               "naive": say("mail_send", to=to, subject=f"{qty} {product}", body="We can deliver by the date below.\nPROMISE: {promised}")}]
-    return task(f"w{week:02d}-quote", f"Week {week} delivery promise", "sales", week, 2, [2, 9], prompt, checks, steps, kind="customer")
+    seed = {"inbox": [{"id": f"in-w{week:02d}-quote", "from": to, "to": "me", "subject": f"Delivery date for {qty} {name}?",
+                       "body": f"If we order {qty} {name} ({product}) today, when could you deliver?"}]}
+    return task(f"w{week:02d}-quote", f"Week {week} delivery promise", "sales", week, 2, [2, 9], prompt, checks, steps, kind="customer", seed=seed)
 
 
 def buffer_task(week: int) -> dict:

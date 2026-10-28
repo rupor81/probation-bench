@@ -56,3 +56,10 @@ fake:
           PROMISE: {promised}
 default_reply: I have nothing to add beyond what is in the tables and the wiki. Use your judgment.
 kind: customer
+seed:
+  inbox:
+  - id: in-w08-quote
+    from: purchasing@norrell.example
+    to: me
+    subject: Delivery date for 40 frames?
+    body: If we order 40 frames (FR) today, when could you deliver?
