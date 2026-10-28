@@ -20,6 +20,14 @@ DEALS = {"A": ("Kessler Bau", "kessler"), "B": ("Ortega Logistics", "ortega"), "
 """The deals that can close this month: letter -> (account, the word that finds it in a CRM row or a mail domain)."""
 NEVER_COMMIT = ("brightline", "halden")
 DECISIONS = ("work", "nurture", "disqualify")
+SYNONYMS = {"work": r"work.*|accept.*|pursue.*|qualif(y|ied)|active|open|go", "nurture": r"nurture.*|park.*|later|follow.?up.*|revisit.*|hold",
+            "disqualify": r"disqualif.*|reject.*|declin.*|drop.*|no.?go|not a fit|lost|spam|ignore.*"}
+"""Words a rep uses for the three decisions; the rule is about deciding, not about the word."""
+
+
+def _decision(value: str) -> str:
+    value = value.strip().lower()
+    return next((d for d, pattern in SYNONYMS.items() if re.fullmatch(pattern, value)), value)
 FREE_DISCOUNT = 10.0
 """Discounts up to this percent need nobody's approval."""
 
@@ -177,7 +185,7 @@ def leads_decided(check, before, after, trace):
     for m in leads:
         company = m["subject"].removeprefix("[Web lead]").strip()
         row = next((r for r in rows if company.lower().split()[0] in r.get("lead", "").lower()), None)
-        decision = (row or {}).get("decision", "").strip().lower()
+        decision = _decision((row or {}).get("decision", ""))
         if decision not in DECISIONS or (decision == "nurture" and not _iso(row.get("revisit_date", ""))) or \
                 (decision == "disqualify" and not row.get("reason", "").strip()):
             missing.append(company)
@@ -186,7 +194,7 @@ def leads_decided(check, before, after, trace):
 
 def lead_decision(check, before, after, trace):
     row = next((r for r in read_table(after, "crm_leads") if re.search(check["lead"], r.get("lead", ""), re.IGNORECASE)), None)
-    value = (row or {}).get("decision", "").strip().lower()
+    value = _decision((row or {}).get("decision", ""))
     return None if re.fullmatch(check["decision"], value) else f"lead {check['lead']} is {value or 'undecided'}"
 
 
