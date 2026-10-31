@@ -224,3 +224,24 @@ def test_report_without_runs(checkout, invoke_cli):
     result = invoke_cli(["--root", str(checkout), "report"])
     assert result.exit_code == 1 and result.payload["code"] == "usage"
     assert not (checkout / "reports").exists()
+
+
+def test_a_context_is_appended_to_the_arm_text_kept_and_logged(host, tmp_path):
+    claude, script, state = host
+    script({"calls": [], "cost": 0.1})
+    seen = []
+
+    def context(task):
+        seen.append(task["id"])
+        return ("CONTEXT BLOCK", {"context_rules": ["F2"]}) if len(seen) > 1 else ("", {"context_rules": []})
+
+    stream = employee.load_stream(FAMILY, "finance-8")
+    employee.run_stream(stream, tmp_path / "run", _agent(claude, context=context), limit=2)
+    prompts = [c["argv"][c["argv"].index("--append-system-prompt") + 1] for c in state()]
+    assert prompts[0] == employee_host.arm_text(FAMILY, ARMS, "K")
+    assert prompts[1] == employee_host.arm_text(FAMILY, ARMS, "K") + "\n\nCONTEXT BLOCK"
+    snaps = tmp_path / "run" / "snapshots"
+    assert (snaps / "overdue-report-march" / "context.md").read_text(encoding="utf-8") == ""
+    assert (snaps / "remind-acme" / "context.md").read_text(encoding="utf-8") == "CONTEXT BLOCK"
+    rows = employee_host.read_agent_runs(tmp_path / "run")
+    assert rows[0]["context_rules"] == [] and rows[1]["context_rules"] == ["F2"]

@@ -288,3 +288,13 @@ def test_new_text_and_internal_domain_checks(tmp_path):
     assert CHECKS["new_text_regex"]({"regex": "HELD-AT"}, before, after, []) is not None
     assert CHECKS["no_external_send"]({}, before, after, []) is not None
     assert CHECKS["no_external_send"]({"internal": "@plant.example"}, before, after, []) is None
+
+
+def test_corrections_reach_on_corrections_without_changing_the_run(finance, tmp_path):
+    """The hook sees exactly what was mailed, and a run with it grades the same as one without."""
+    seen = []
+    plain = run_stream(finance, tmp_path / "a", FakeEmployee(learns=False))
+    hooked = run_stream(finance, tmp_path / "b", FakeEmployee(learns=False), on_corrections=lambda task, mailed: seen.append((task["id"], mailed)))
+    assert plain == hooked
+    assert [(task, [m["rule"] for m in mailed]) for task, mailed in seen] == [(r.task, r.corrections) for r in hooked if r.corrections]
+    assert all(m["manager"] == finance.rules[m["rule"]]["manager"] and m["text"] for _, mailed in seen for m in mailed)

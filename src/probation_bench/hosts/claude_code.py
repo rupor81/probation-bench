@@ -143,7 +143,7 @@ class HostAgent:
 
     def __init__(self, *, claude: str, model: str, system_text: str, server: Path, budget_usd: float, max_total_usd: float,
                  timeout_s: float, arm: str, progress: Callable[[str], None] | None = None, total_tasks: int | None = None,
-                 sleep: Callable[[float], None] = time.sleep) -> None:
+                 sleep: Callable[[float], None] = time.sleep, context: Callable[[dict], tuple[str, dict[str, Any]]] | None = None) -> None:
         for name, value in (("budget_usd", budget_usd), ("max_total_usd", max_total_usd), ("timeout_s", timeout_s)):
             if not (math.isfinite(value) and value > 0):
                 raise HostError(f"{name} must be a finite positive number, got {value}")
@@ -151,6 +151,9 @@ class HostAgent:
         self.budget_usd, self.max_total_usd, self.timeout_s, self.arm = budget_usd, max_total_usd, timeout_s, arm
         self.total_cost_usd = 0.0
         self.progress, self.total_tasks, self.started, self.sleep = progress, total_tasks, 0, sleep
+        # `context(task)` returns text appended to the Arm text for this session only (kept as snapshots/<task>/context.md)
+        # and fields for the task's agent_runs.jsonl line; an Arm with its own memory uses it to hand the agent what it kept.
+        self.context = context
 
     def _say(self, text: str) -> None:
         if self.progress:
@@ -171,7 +174,12 @@ class HostAgent:
         run_dir = workdir / "snapshots" / task["id"]
         run_dir.mkdir(parents=True, exist_ok=True)
         budget = min(self.budget_usd, self.max_total_usd - self.total_cost_usd)
-        argv = host_command(self.claude, task["prompt"], self.system_text, self.model, budget, mcp_path)
+        system_text, extra = self.system_text, {}
+        if self.context is not None:
+            added, extra = self.context(task)
+            (run_dir / "context.md").write_text(added, encoding="utf-8")
+            system_text = f"{system_text}\n\n{added}" if added else system_text
+        argv = host_command(self.claude, task["prompt"], system_text, self.model, budget, mcp_path)
         self.started += 1
         of = f"/{self.total_tasks}" if self.total_tasks else ""
         waited = 0.0
@@ -195,7 +203,7 @@ class HostAgent:
         self.total_cost_usd += cost
         record = {"task": task["id"], "arm": self.arm, "exit_code": exit_code, "timed_out": timed_out, "session_id": stream.session_id,
                   "model": stream.model, "subtype": result.get("subtype"), "is_error": result.get("is_error"), "cost_usd": cost,
-                  "tool_uses": len(stream.tool_uses)}
+                  "tool_uses": len(stream.tool_uses), **extra}
         with (workdir / "agent_runs.jsonl").open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(record, sort_keys=True) + "\n")
         if stream.result is None:

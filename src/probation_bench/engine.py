@@ -572,11 +572,14 @@ CHECKS: dict[str, Callable] = {
 
 
 def run_stream(stream: Stream, workdir: Path, agent: Callable[[Path, dict], float | None], limit: int | None = None,
-               on_result: Callable[[TaskResult], None] | None = None) -> list[TaskResult]:
+               on_result: Callable[[TaskResult], None] | None = None,
+               on_corrections: Callable[[dict, list[dict[str, str]]], None] | None = None) -> list[TaskResult]:
     """Run the first `limit` tasks (all, when None) of `stream` in order over one persistent office in `workdir/office`.
 
     An agent may return the model cost of its session in USD; it lands in `TaskResult.cost_usd`. `on_result` sees every
-    result as soon as its task is graded, so a caller keeps the partial run when the agent raises."""
+    result as soon as its task is graded, so a caller keeps the partial run when the agent raises. `on_corrections` sees
+    the task and the corrections just mailed (`{rule, manager, text}`, `text` the mail body), only when some were: an Arm
+    with its own memory records them; the mail goes out the same for every Arm."""
     state = workdir / "office"
     if hasattr(agent, "bind"):
         agent.bind(stream)
@@ -627,7 +630,7 @@ def run_stream(stream: Stream, workdir: Path, agent: Callable[[Path, dict], floa
                         violations.append(rule)
                 else:
                     goal_ok = False
-        posted = []
+        posted, mailed = [], []
         if task.get("feedback", True):
             for rule in violations:
                 text = stream.rules[rule].get("correction")
@@ -637,10 +640,13 @@ def run_stream(stream: Stream, workdir: Path, agent: Callable[[Path, dict], floa
                     with (state / "inbox.jsonl").open("a", encoding="utf-8") as fh:
                         fh.write(json.dumps(message, sort_keys=True) + "\n")
                     posted.append(rule)
+                    mailed.append({"rule": rule, "manager": str(stream.rules[rule].get("manager")), "text": message["body"]})
         results.append(TaskResult(task["id"], level, goal_ok, violations, checked, failed, len(trace),
                                   len(_jsonl(state / "questions.jsonl")) - questions_before, posted,
                                   list(task["groups"]), bool(task.get("anchor")), round(float(cost or 0.0), 6),
                                   task.get("kind"), task.get("week"), variant, chosen))
+        if on_corrections and mailed:
+            on_corrections(task, mailed)
         if on_result:
             on_result(results[-1])
     return results
