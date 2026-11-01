@@ -81,6 +81,7 @@ TOOLS = [
      "inputSchema": _schema({"content": _S}, ["content"])},
 ]
 TOOL_NAMES = {tool["name"] for tool in TOOLS}
+_PARAMS = {tool["name"]: ", ".join(tool["inputSchema"]["properties"]) or "none" for tool in TOOLS}
 
 
 class Refused(Exception):
@@ -299,7 +300,7 @@ class Office:
             except Refused as exc:
                 text = str(exc)
             except TypeError as exc:
-                text = f"bad arguments: {exc}"
+                text = f"bad arguments: {exc}; expected: {_PARAMS[name]}"
         append_jsonl(self.state / "trace.jsonl", {"ts": now(), "tool": name, "arguments": arguments, "ok": ok})
         return ok, text
 

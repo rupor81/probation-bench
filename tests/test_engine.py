@@ -235,6 +235,8 @@ def test_real_office_server_serves_the_seeded_office(finance, tmp_path):
     run_stream(finance, tmp_path, lambda state, task: None)
     office = office_server.Office(tmp_path / "office")
     assert "Today is 2026-03-31" in office.call("kb_read", {"page": "calendar"})[1]
+    ok, text = office.call("table_read", {"table": "x"})
+    assert not ok and text.endswith("expected: name")
 
 
 def test_repeat_misses_count_rules_broken_after_their_correction(finance, tmp_path):
