@@ -97,6 +97,9 @@ call). It may not redefine an engine check type. `probation_bench.engine` export
    covers all 19 groups.
 5. A family whose facts move (`fact` on its steps) also shows the memoriser below the learner, and one with
    `improve` steps shows the teacher meeting fewer seeded mistakes than the learner.
+6. A check grades only a document the agent can learn it should write: every word of the checked path appears in the
+   task, a correction, the office or the frame (a goal on a file name nobody gives fails a competent agent).
+7. `frame.md` says which date is today and that it overrides the computer clock (the host sees the real clock).
 
 Also expected, and checked in review:
 
