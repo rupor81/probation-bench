@@ -1,6 +1,7 @@
 """`pbench`: validate a family, dry-run it with scripted employees, run Arms through a host, report a batch.
 
-Every command takes `--root` (default: the current directory), the checkout holding `families/` and `arms/`. Progress
+Every command takes `--root` (default: the current directory), the checkout holding `families/` and `arms/`
+(without a `families/` folder there, the families installed with the package). Progress
 goes to stderr; the last line on stdout is one JSON object with the outcome. Exit 0 on success, 1 on bad input or a
 missing batch, 3 when the host binary is missing.
 """
@@ -40,10 +41,11 @@ def _say(text: str) -> None:
 
 
 def _family(root: Path, name: str) -> Path:
-    family = root / "families" / name
+    families = engine.families_dir(root)
+    family = families / name
     if not family.is_dir():
-        known = sorted(p.name for p in (root / "families").iterdir() if p.is_dir()) if (root / "families").is_dir() else []
-        raise UsageError(f"no family {name!r} under {root / 'families'}; known: {', '.join(known) or 'none'}")
+        known = sorted(p.name for p in families.iterdir() if p.is_dir()) if families.is_dir() else []
+        raise UsageError(f"no family {name!r} under {families}; known: {', '.join(known) or 'none'}")
     return family
 
 

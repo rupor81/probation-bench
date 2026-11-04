@@ -41,7 +41,7 @@ from typing import Any, Callable
 import yaml
 
 __all__ = [
-    "CHECKS", "GROUPS", "BenchError", "TaskResult", "bootstrap_ci", "coverage", "extinction", "load_stream", "paired", "pareto_front",
+    "CHECKS", "GROUPS", "BenchError", "families_dir", "TaskResult", "bootstrap_ci", "coverage", "extinction", "load_stream", "paired", "pareto_front",
     "files_matching", "learning_curve", "load_family_code", "new_rows", "new_texts", "read_jsonl", "read_table", "render_markdown", "repeat_misses", "results_from_json", "results_to_json", "run_stream", "shuffle_order", "summarize",
 ]
 
@@ -53,6 +53,14 @@ GROUPS = {
 }
 """The trait groups a task tests (`groups:`); the report gives pass rates per group and the coverage check names gaps."""
 INTERNAL_DOMAIN = "@office.example"
+PACKAGED_FAMILIES = Path(__file__).with_name("families")
+"""The families shipped inside the wheel; a checkout reads its own `families/` instead."""
+
+
+def families_dir(root: Path | None = None) -> Path:
+    """`root/families` when that folder exists (a checkout), else the families installed with the package."""
+    return root / "families" if root is not None and (root / "families").is_dir() else PACKAGED_FAMILIES
+
 _NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}\Z")
 
 
