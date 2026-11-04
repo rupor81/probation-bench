@@ -4,7 +4,7 @@ manager: operations
 half: 2
 groups:
 - 14
-prompt: Is there already a faster way to load supplier price lists? Check before building anything.
+prompt: Is there already a faster way to load supplier price lists? Check before building anything, and write your answer to scout-prices.md.
 feedback: true
 checks:
 - type: file_exists

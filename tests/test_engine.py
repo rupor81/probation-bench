@@ -237,6 +237,8 @@ def test_real_office_server_serves_the_seeded_office(finance, tmp_path):
     assert "Today is 2026-03-31" in office.call("kb_read", {"page": "calendar"})[1]
     ok, text = office.call("table_read", {"table": "x"})
     assert not ok and text.endswith("expected: name")
+    assert office.call("file_write", {"path": "files/a/b.md", "content": "x"})[0]  # prompts name documents as files/X
+    assert office.call("file_read", {"path": "a/b.md"}) == (True, "x") and not (tmp_path / "office" / "files" / "files").exists()
 
 
 def test_repeat_misses_count_rules_broken_after_their_correction(finance, tmp_path):
