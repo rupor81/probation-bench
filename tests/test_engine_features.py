@@ -187,3 +187,11 @@ def test_a_reaction_case_cannot_set_unknown_keys(tmp_path):
     path.write_text(yaml.safe_dump(task))
     with pytest.raises(BenchError, match="cannot set"):
         load_stream(root, "a")
+
+
+def test_families_dir_prefers_the_checkout_and_falls_back_to_the_package(tmp_path):
+    from probation_bench import engine
+
+    assert engine.families_dir(tmp_path) == engine.PACKAGED_FAMILIES
+    (tmp_path / "families").mkdir()
+    assert engine.families_dir(tmp_path) == tmp_path / "families"
