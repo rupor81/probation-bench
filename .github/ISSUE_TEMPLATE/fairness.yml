@@ -1,0 +1,35 @@
+name: Unfair check or task
+description: A check fails a competent answer, or passes a wrong one.
+labels: [fairness]
+body:
+  - type: input
+    id: task
+    attributes:
+      label: Family and task
+      placeholder: office-generalist / weekly-summary-15
+    validations:
+      required: true
+  - type: textarea
+    id: check
+    attributes:
+      label: The check
+      description: The check as it is in the task file.
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: answer
+    attributes:
+      label: An answer it grades wrongly
+      description: What a competent employee did (or a wrong one did), and why the grade is wrong. Nothing in a prompt, correction or page should be missing from this argument.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence from runs (optional)
+      description: Batches, models, Arms, how often the check flipped.
+  - type: textarea
+    id: fix
+    attributes:
+      label: Possible fix (optional)

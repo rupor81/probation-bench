@@ -6,8 +6,9 @@ Probation Bench puts a model or an agent system through a probation period in a 
 through a long stream of ordinary office assignments. The managers have unwritten rules and correct the agent when
 it breaks one. The bench counts whether each mistake dies out after the correction or keeps coming back.
 
-Status: early. Two task families (58 office tasks; 101 tasks over a quarter in a plant), one host adapter (Claude
-Code), free dry runs with scripted employees, and [pilot results](#pilot-results). More hosts and applied task families
+Status: early (v0.1.0). Three task families (58 office tasks; 101 tasks over a quarter in a plant; 37 tasks over a
+month of selling), one host adapter (Claude Code), free dry runs with scripted employees, and
+[pilot results](#pilot-results). More hosts and applied task families
 (corporate management, manufacturing) are on the [roadmap](#roadmap).
 
 ## Why another benchmark
@@ -167,9 +168,13 @@ Six full runs of the 58-task stream, October 2026 ([details](results/2026-10-pil
 | Fable 5.1 | `P` | 31 | 4 of 27 | 40.69 |
 | Sonnet 5.5 | `P` | 24 | 12 of 26 | 5.90 |
 
+Arm `P` is a private operating text (a page of working principles); its wording is not published, and it is
+reported so the model comparison has a common Arm.
+
 Instructions changed nothing in the first half of the stream and a lot in the second, once corrections had piled
 up. The model mattered most for not repeating a corrected mistake. One or two runs per cell, and no paired difference
-reaches p < 0.05 yet: treat these as a pilot.
+reaches p < 0.05 yet: treat these as a pilot. Known grading issues are tracked under the
+[`fairness`](https://github.com/rupor81/probation-bench/issues?q=label%3Afairness) label.
 
 ## Repository layout
 
@@ -193,6 +198,8 @@ families/
 arms/                   system-prompt texts to compare
 results/                published, reviewed run reports
 tests/
+CHANGELOG.md            what changed in each release
+CITATION.cff            how to cite the bench
 ```
 
 ## A task, end to end

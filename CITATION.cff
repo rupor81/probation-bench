@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use Probation Bench, please cite it as below."
+title: "Probation Bench: does your AI agent learn on the job?"
+type: software
+authors:
+  - name: rupor81
+version: 0.1.0
+date-released: 2026-11-09
+license: Apache-2.0
+repository-code: "https://github.com/rupor81/probation-bench"
+abstract: >-
+  A benchmark of how AI models and agents learn on the job: a long stream of office assignments in one persistent
+  simulated company, managers with unwritten rules who correct the agent by mail, and a count of whether each
+  corrected mistake dies out or comes back.
+keywords:
+  - benchmark
+  - AI agents
+  - continual learning
+  - LLM evaluation
+  - MCP

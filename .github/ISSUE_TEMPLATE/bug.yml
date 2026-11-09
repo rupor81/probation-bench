@@ -1,0 +1,22 @@
+name: Bug
+description: The engine, the office server, a host adapter or the CLI misbehaves.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The command (prefer a free `pbench dry-run` or `pbench validate` repro) and its output.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
