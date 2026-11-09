@@ -1,0 +1,30 @@
+name: New task family
+description: Propose a simulated workplace with its own managers, rules and tasks.
+labels: [family]
+body:
+  - type: markdown
+    attributes:
+      value: Read the family contract in CONTRIBUTING.md first. Agreeing on the design here saves rework.
+  - type: textarea
+    id: workplace
+    attributes:
+      label: The workplace
+      description: What the company or team does, who the managers are, what a normal week looks like.
+    validations:
+      required: true
+  - type: textarea
+    id: rules
+    attributes:
+      label: Hidden rules
+      description: Three to five examples. A good rule is one a sensible new employee could break on day one, that a manager would correct in one sentence, and that a check can grade from the office state or the tool trace.
+    validations:
+      required: true
+  - type: textarea
+    id: groups
+    attributes:
+      label: Trait groups
+      description: Which of the 19 trait groups (README, "What is measured") the family would exercise.
+  - type: textarea
+    id: you
+    attributes:
+      label: Your domain experience (optional)

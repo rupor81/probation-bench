@@ -1,0 +1,23 @@
+name: Host adapter
+description: Run the bench through another agent system or a bare model loop.
+labels: [host]
+body:
+  - type: input
+    id: host
+    attributes:
+      label: Host
+      placeholder: Codex CLI, a bare tool-calling loop, ...
+    validations:
+      required: true
+  - type: textarea
+    id: isolation
+    attributes:
+      label: Isolation
+      description: How the host is limited to the office tools (no shell, no files, no user settings) and how each task gets a fresh session.
+    validations:
+      required: true
+  - type: textarea
+    id: cost
+    attributes:
+      label: Cost and limits
+      description: How spend is reported and capped per task and per Arm.
