@@ -1,6 +1,6 @@
 [project]
 name = "probation-bench"
-version = "0.1.0"
+version = "0.1.1"
 description = "A benchmark of how AI models and agents learn on the job: a simulated office, managers' corrections, repeated mistakes counted."
 readme = "README.md"
 license = "Apache-2.0"
