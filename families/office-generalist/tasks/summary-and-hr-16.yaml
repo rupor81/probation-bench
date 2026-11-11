@@ -12,6 +12,7 @@ checks:
 - type: file_regex
   path: '**/*.md'
   regex: (?i)W16|week 16
+  name: true
 - type: file_regex
   path: summaries/2026-W16.md
   regex: '^DECISION:'

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- **Fairness.** `file_regex` takes `name: true` to accept a match in the document's path as well as its text. The four
+  weekly-summary goals use it, so a summary named `summaries/2026-W15.md` names its week (#4).
+
 ## 0.1.0 (2026-11-09)
 
 First tagged release. A paired engine and family set: a pinned install carries the tasks its engine was tested with.

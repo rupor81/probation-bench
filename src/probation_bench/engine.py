@@ -406,6 +406,8 @@ def _check_file_regex(check, before, after, trace):
     for path in files:
         lines = _lines(path)
         text = "\n".join(lines) if where == "any" else (lines[0] if where == "first" and lines else lines[-1] if lines else "")
+        if check.get("name") and re.search(check["regex"], path.relative_to(after / "files").as_posix()):
+            return None  # `name: true`: a document's path names it too (summaries/2026-W15.md is the week 15 summary)
         if re.search(check["regex"], text, re.MULTILINE):
             return None
     return f"{check['path']} lacks /{check['regex']}/ ({where})"
