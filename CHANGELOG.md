@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.1 (2026-11-11)
 
 - **Fairness.** `file_regex` takes `name: true` to accept a match in the document's path as well as its text. The four
   weekly-summary goals use it, so a summary named `summaries/2026-W15.md` names its week (#4).

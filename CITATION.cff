@@ -4,8 +4,8 @@ title: "Probation Bench: does your AI agent learn on the job?"
 type: software
 authors:
   - name: rupor81
-version: 0.1.0
-date-released: 2026-11-09
+version: 0.1.1
+date-released: 2026-11-11
 license: Apache-2.0
 repository-code: "https://github.com/rupor81/probation-bench"
 abstract: >-
