@@ -195,3 +195,14 @@ def test_families_dir_prefers_the_checkout_and_falls_back_to_the_package(tmp_pat
     assert engine.families_dir(tmp_path) == engine.PACKAGED_FAMILIES
     (tmp_path / "families").mkdir()
     assert engine.families_dir(tmp_path) == tmp_path / "families"
+
+
+def test_file_regex_with_name_accepts_the_week_in_the_document_path(tmp_path):
+    from probation_bench.engine import _check_file_regex
+
+    (tmp_path / "files" / "summaries").mkdir(parents=True)
+    (tmp_path / "files" / "summaries" / "2026-W15.md").write_text("DECISION: hold\nDONE: two orders\n", encoding="utf-8")
+    check = {"type": "file_regex", "path": "**/*.md", "regex": "(?i)W15|week 15"}
+    assert _check_file_regex(check, tmp_path, tmp_path, []) is not None  # issue #4: the week only in the name failed
+    assert _check_file_regex({**check, "name": True}, tmp_path, tmp_path, []) is None
+    assert _check_file_regex({**check, "name": True, "regex": "W16"}, tmp_path, tmp_path, []) is not None

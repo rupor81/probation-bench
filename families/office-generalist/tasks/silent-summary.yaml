@@ -10,6 +10,7 @@ checks:
 - type: file_regex
   path: '**/*.md'
   regex: (?i)W17|week 17
+  name: true
 - type: file_regex
   path: summaries/2026-W17.md
   regex: '^DECISION:'
